@@ -326,8 +326,8 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE).
 
 ## Kontak
 
-Jika Anda memiliki pertanyaan atau ingin berkontribusi, silakan buka issue di repository GitHub atau hubungi maintainer di email@example.com.
+Jika Anda memiliki pertanyaan atau ingin berkontribusi, silakan buka issue di repository GitHub atau hubungi maintainer di bhakti.utama@gmail.com.
 
 ---
 
-Dibuat dengan ❤️ oleh [Your Name] 
+Dibuat dengan ❤️ oleh Bhakti Utama
