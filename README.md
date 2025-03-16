@@ -1,8 +1,8 @@
-# Todo List App
+# Todo List Pastebin
 
 Aplikasi Todo List yang dapat dibagikan, dibangun dengan Go dan Next.js, terinspirasi oleh Pastebin. Aplikasi ini memungkinkan pengguna untuk membuat, mengedit, dan berbagi daftar tugas tanpa perlu login.
 
-![Todo List App Screenshot](docs/screenshot.png)
+![Todo List Pastebin Screenshot](docs/screenshot.png)
 
 ## Fitur
 

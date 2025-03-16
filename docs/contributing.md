@@ -1,6 +1,6 @@
 # Panduan Kontribusi
 
-Terima kasih atas minat Anda untuk berkontribusi pada proyek Todo List App! Dokumen ini berisi informasi tentang cara berkontribusi, standar kode, dan proses pull request.
+Terima kasih atas minat Anda untuk berkontribusi pada proyek Todo List Pastebin! Dokumen ini berisi informasi tentang cara berkontribusi, standar kode, dan proses pull request.
 
 ## Persiapan
 
@@ -30,18 +30,22 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
 ### Go (Backend)
 
 1. **Formatting**:
+
    - Gunakan `gofmt` atau `goimports` untuk memformat kode.
    - Jalankan: `go fmt ./...` sebelum commit.
 
 2. **Linting**:
+
    - Gunakan `golint` dan `go vet` untuk memeriksa kode.
    - Jalankan: `golint ./...` dan `go vet ./...` sebelum commit.
 
 3. **Testing**:
+
    - Tulis unit test untuk kode baru.
    - Pastikan semua test lulus: `go test ./...`
 
 4. **Penanganan Error**:
+
    - Selalu periksa dan tangani error.
    - Gunakan log level yang sesuai untuk error.
 
@@ -51,18 +55,22 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
 ### TypeScript/JavaScript (Frontend)
 
 1. **Formatting**:
+
    - Gunakan Prettier untuk memformat kode.
    - Jalankan: `npm run format` sebelum commit.
 
 2. **Linting**:
+
    - Gunakan ESLint untuk memeriksa kode.
    - Jalankan: `npm run lint` sebelum commit.
 
 3. **Testing**:
+
    - Tulis unit test untuk komponen React.
    - Pastikan semua test lulus: `npm run test`
 
 4. **Nama Komponen**:
+
    - Gunakan PascalCase untuk nama komponen React.
    - Gunakan camelCase untuk fungsi dan variabel.
 
@@ -75,6 +83,7 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
 ### Langkah-langkah
 
 1. **Perbarui branch Anda** dengan perubahan terbaru dari upstream:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
@@ -83,12 +92,14 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
 2. **Implementasikan perubahan** Anda.
 
 3. **Commit perubahan** Anda dengan pesan commit yang jelas:
+
    ```bash
    git add .
    git commit -m "Jenis: Deskripsi singkat perubahan"
    ```
-   
+
    Jenis commit:
+
    - `feat`: Fitur baru
    - `fix`: Perbaikan bug
    - `docs`: Perubahan dokumentasi
@@ -98,6 +109,7 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
    - `chore`: Perubahan build atau tooling
 
 4. **Push ke repository** Anda:
+
    ```bash
    git push origin feature/nama-fitur
    ```
@@ -142,15 +154,18 @@ Jika Anda ingin menambahkan fitur baru yang signifikan:
 Kami selalu mencari kontribusi untuk area berikut:
 
 1. **Peningkatan UI/UX**:
+
    - Tema gelap/terang
    - Aksesibilitas
    - Mobile responsiveness
 
 2. **Performa**:
+
    - Optimasi query Redis
    - Caching di frontend
 
 3. **Fitur Baru**:
+
    - Subtasks
    - Labels/tags
    - Due dates
@@ -180,4 +195,4 @@ Proyek ini mengadopsi [Contributor Covenant Code of Conduct](https://www.contrib
 
 ---
 
-Terima kasih telah berkontribusi ke Todo List App! 
+Terima kasih telah berkontribusi ke Todo List Pastebin!
