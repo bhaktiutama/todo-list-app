@@ -1,23 +1,27 @@
 import React, { useEffect, useRef } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { TodoItem as TodoItemType } from '../types/todo';
+import dynamic from 'next/dynamic';
 
 interface TodoItemProps {
     item: TodoItemType;
     index: number;
-    onToggleComplete: (id: string) => void;
-    onDelete: (id: string) => void;
-    onEdit: (id: string, content: string) => void;
     isEditable: boolean;
+    onUpdate: (item: TodoItemType) => void;
+    onDelete: (id: string) => void;
 }
+
+// Lazy load ThemeToggle untuk mengurangi main bundle size
+const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), {
+    ssr: false, // Hindari server-side rendering
+});
 
 export function TodoItem({
     item,
     index,
-    onToggleComplete,
-    onDelete,
-    onEdit,
-    isEditable
+    isEditable,
+    onUpdate,
+    onDelete
 }: TodoItemProps) {
     const [isEditing, setIsEditing] = React.useState(false);
     const [editContent, setEditContent] = React.useState(item.content);
@@ -50,9 +54,19 @@ export function TodoItem({
 
     const handleSave = () => {
         if (editContent.trim() !== '') {
-            onEdit(item.id, editContent);
+            onUpdate({
+                ...item,
+                content: editContent
+            });
             setIsEditing(false);
         }
+    };
+
+    const handleToggleComplete = () => {
+        onUpdate({
+            ...item,
+            completed: !item.completed
+        });
     };
 
     return (
@@ -70,8 +84,8 @@ export function TodoItem({
                             : 'shadow-sm hover:shadow-md'
                         }
                         ${item.completed 
-                            ? 'bg-gradient-to-r from-green-50/80 to-green-100/80 border border-green-200' 
-                            : 'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-100/50 border border-gray-100 hover:border-blue-200'
+                            ? 'bg-gradient-to-r from-green-50/80 to-green-100/80 dark:from-green-900/20 dark:to-green-800/20 border border-green-200 dark:border-green-800' 
+                            : 'bg-white/60 dark:bg-slate-800/60 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-100/50 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 border border-slate-200 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-700'
                         }
                         transition-all duration-200 ease-in-out transform
                         ${isEditable ? 'cursor-grab active:cursor-grabbing' : ''}
@@ -91,15 +105,15 @@ export function TodoItem({
                         <input
                             type="checkbox"
                             checked={item.completed}
-                            onChange={() => onToggleComplete(item.id)}
+                            onChange={handleToggleComplete}
                             className={`w-5 h-5 rounded-full border-2 
                                 transition-all duration-200 ease-in-out cursor-pointer
                                 ${item.completed
-                                    ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
-                                    : 'border-gray-300 hover:border-blue-500'
+                                    ? 'border-green-500 dark:border-green-400 bg-green-500 dark:bg-green-400 hover:bg-green-600 dark:hover:bg-green-500 hover:border-green-600 dark:hover:border-green-500'
+                                    : 'border-slate-300 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-400'
                                 }
                                 focus:ring-2 focus:ring-offset-2 
-                                ${item.completed ? 'focus:ring-green-500' : 'focus:ring-blue-500'}
+                                ${item.completed ? 'focus:ring-green-500 dark:focus:ring-green-400' : 'focus:ring-blue-500 dark:focus:ring-blue-400'}
                                 mr-4`}
                         />
                     </div>
@@ -111,10 +125,10 @@ export function TodoItem({
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
                             onBlur={handleSave}
-                            className="flex-1 p-2 bg-transparent border-b-2 border-blue-500 
-                                focus:outline-none focus:border-blue-700
+                            className="flex-1 p-2 bg-transparent border-b-2 border-blue-500 dark:border-blue-400
+                                focus:outline-none focus:border-blue-700 dark:focus:border-blue-300
                                 transition-all duration-200 ease-in-out
-                                text-gray-700 placeholder-gray-400"
+                                text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500"
                             autoFocus
                             placeholder="What needs to be done?"
                         />
@@ -123,10 +137,10 @@ export function TodoItem({
                             onClick={handleEdit}
                             className={`flex-1 py-1 px-2 -ml-2 rounded
                                 ${item.completed 
-                                    ? 'line-through text-gray-400' 
-                                    : 'text-gray-700'
+                                    ? 'line-through text-slate-400 dark:text-slate-500' 
+                                    : 'text-slate-700 dark:text-slate-200'
                                 } 
-                                ${isEditable ? 'hover:bg-white/50 cursor-pointer' : ''}
+                                ${isEditable ? 'hover:bg-white/50 dark:hover:bg-slate-700/50 cursor-pointer' : ''}
                                 transition-all duration-200 ease-in-out`}
                         >
                             {item.content}
@@ -139,8 +153,8 @@ export function TodoItem({
                             {!isEditing && (
                                 <button
                                     onClick={handleEdit}
-                                    className="p-2 text-gray-400 hover:text-blue-600 rounded-lg
-                                        hover:bg-blue-50/50 transition-all duration-200"
+                                    className="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg
+                                        hover:bg-blue-50/50 dark:hover:bg-blue-900/50 transition-all duration-200"
                                     title="Edit (double click)"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -150,8 +164,8 @@ export function TodoItem({
                             )}
                             <button
                                 onClick={() => onDelete(item.id)}
-                                className="p-2 text-gray-400 hover:text-red-600 rounded-lg
-                                    hover:bg-red-50/50 transition-all duration-200"
+                                className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg
+                                    hover:bg-red-50/50 dark:hover:bg-red-900/50 transition-all duration-200"
                                 title="Delete (Del)"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -165,8 +179,8 @@ export function TodoItem({
                     {item.completed && (
                         <div className="absolute right-0 top-0 -mt-2 -mr-2">
                             <div className="relative">
-                                <div className="absolute -inset-1 bg-green-500 rounded-full blur opacity-30"></div>
-                                <div className="relative bg-white text-green-500 rounded-full p-1">
+                                <div className="absolute -inset-1 bg-green-500 dark:bg-green-400 rounded-full blur opacity-30"></div>
+                                <div className="relative bg-white dark:bg-slate-800 text-green-500 dark:text-green-400 rounded-full p-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                     </svg>

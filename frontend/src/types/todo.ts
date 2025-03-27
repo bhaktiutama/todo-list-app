@@ -3,15 +3,15 @@ export interface TodoItem {
     content: string;
     completed: boolean;
     order: number;
-    created_at: string;
-    completed_at?: string;
+    created_at?: string;
 }
 
 export interface TodoList {
     id: string;
     items: TodoItem[];
-    created_at: string;
-    expires_at: string;
+    created_at?: string;
+    expires_at?: string;
+    edit_token?: string;
 }
 
 export interface CreateTodoListRequest {

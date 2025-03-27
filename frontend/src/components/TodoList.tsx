@@ -196,8 +196,18 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
                 </div>
 
                 {/* Todo Items */}
-                <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="todo-list">
+                <DragDropContext 
+                    onDragEnd={handleDragEnd}
+                    enableDefaultSensors={true}
+                >
+                    <Droppable 
+                        droppableId="todo-list" 
+                        isDropDisabled={!isEditable}
+                        isCombineEnabled={false}
+                        ignoreContainerClipping={false}
+                        mode="standard"
+                        type="DEFAULT"
+                    >
                         {(provided) => (
                             <div
                                 {...provided.droppableProps}
