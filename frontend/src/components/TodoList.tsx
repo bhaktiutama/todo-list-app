@@ -6,12 +6,12 @@ import { useWebSocket } from '../hooks/useWebSocket';
 
 interface TodoListProps {
     todoList: TodoListType;
-    clientId: string;
-    canEdit: boolean;
+    isEditable: boolean;
     onUpdate: (todoList: TodoListType) => void;
+    isSaving?: boolean;
 }
 
-export function TodoList({ todoList: initialTodoList, clientId, canEdit, onUpdate }: TodoListProps) {
+export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSaving = false }: TodoListProps) {
     const [todoList, setTodoList] = useState<TodoListType>(initialTodoList);
     const [isPolling, setIsPolling] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
@@ -66,30 +66,29 @@ export function TodoList({ todoList: initialTodoList, clientId, canEdit, onUpdat
     }, [isWebSocketEnabled, todoList.id]);
 
     const handleDragEnd = async (result: any) => {
-        if (!result.destination || !canEdit) return;
+        if (!result.destination || !isEditable) return;
 
         const items = Array.from(todoList.items);
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
-        // Update order numbers
+        // Update order property for each item
         const updatedItems = items.map((item, index) => ({
             ...item,
-            order: index,
+            order: index
         }));
 
         const updatedTodoList = {
             ...todoList,
-            items: updatedItems,
+            items: updatedItems
         };
 
-        setIsSyncing(true);
         setTodoList(updatedTodoList);
         onUpdate(updatedTodoList);
     };
 
     const handleItemUpdate = async (updatedItem: TodoItemType) => {
-        if (!canEdit) return;
+        if (!isEditable) return;
 
         const updatedItems = todoList.items.map(item =>
             item.id === updatedItem.id ? updatedItem : item
@@ -97,70 +96,67 @@ export function TodoList({ todoList: initialTodoList, clientId, canEdit, onUpdat
 
         const updatedTodoList = {
             ...todoList,
-            items: updatedItems,
+            items: updatedItems
         };
 
-        setIsSyncing(true);
         setTodoList(updatedTodoList);
         onUpdate(updatedTodoList);
     };
 
     const handleAddItem = async () => {
-        if (!canEdit) return;
+        if (!isEditable) return;
 
         const newItem: TodoItemType = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: `temp-${Date.now()}`,
             content: '',
             completed: false,
             order: todoList.items.length,
-            created_at: new Date().toISOString(),
+            created_at: new Date().toISOString()
         };
 
         const updatedTodoList = {
             ...todoList,
-            items: [...todoList.items, newItem],
+            items: [...todoList.items, newItem]
         };
 
-        setIsSyncing(true);
         setTodoList(updatedTodoList);
         onUpdate(updatedTodoList);
     };
 
     const handleDeleteItem = async (itemId: string) => {
-        if (!canEdit) return;
+        if (!isEditable) return;
 
         const updatedItems = todoList.items
             .filter(item => item.id !== itemId)
             .map((item, index) => ({
                 ...item,
-                order: index,
+                order: index
             }));
 
         const updatedTodoList = {
             ...todoList,
-            items: updatedItems,
+            items: updatedItems
         };
 
-        setIsSyncing(true);
         setTodoList(updatedTodoList);
         onUpdate(updatedTodoList);
     };
 
     return (
-        <div className="space-y-6 p-6 bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
+        <div className="space-y-6 p-6 bg-gradient-to-br from-white/80 to-white/40 dark:from-slate-800/80 dark:to-slate-900/40 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-white/10 shadow-xl">
             <div className="flex flex-col space-y-4">
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col">
-                        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
                             Your Tasks
                         </h2>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                             {totalItems === 0 ? 'No tasks yet' : `${completedItems} of ${totalItems} completed`}
                         </p>
                     </div>
                     <div className="flex items-center space-x-3">
-                        {isSyncing && (
-                            <div className="flex items-center px-3 py-1 bg-blue-50 text-blue-600 rounded-full">
+                        {(isSaving || isSyncing) && (
+                            <div className="flex items-center px-3 py-1 bg-blue-50/80 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
                                 <svg className="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -168,9 +164,9 @@ export function TodoList({ todoList: initialTodoList, clientId, canEdit, onUpdat
                                 <span className="text-sm font-medium">Syncing</span>
                             </div>
                         )}
-                        {isPolling && !isSyncing && (
-                            <div className="px-3 py-1 bg-green-50 text-green-600 rounded-full flex items-center">
-                                <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+                        {isPolling && !isSaving && !isSyncing && (
+                            <div className="px-3 py-1 bg-green-50/80 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center">
+                                <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 mr-2 animate-pulse"></div>
                                 <span className="text-sm font-medium">Auto-saving</span>
                             </div>
                         )}
@@ -181,126 +177,79 @@ export function TodoList({ todoList: initialTodoList, clientId, canEdit, onUpdat
                 <div className="relative pt-4">
                     <div className="flex mb-2 items-center justify-between">
                         <div>
-                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-100">
+                            <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 dark:text-blue-400 bg-blue-100/80 dark:bg-blue-900/30">
                                 Task Progress
                             </span>
                         </div>
                         <div className="text-right">
-                            <span className="text-xs font-semibold inline-block text-blue-600">
+                            <span className="text-xs font-semibold inline-block text-blue-600 dark:text-blue-400">
                                 {Math.round(completionPercentage)}%
                             </span>
                         </div>
                     </div>
-                    <div className="overflow-hidden h-2 text-xs flex rounded-full bg-blue-50">
+                    <div className="overflow-hidden h-2 text-xs flex rounded-full bg-blue-50 dark:bg-blue-900/30">
                         <div
                             style={{ width: `${completionPercentage}%` }}
-                            className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out"
+                            className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 transition-all duration-500 ease-out"
                         ></div>
                     </div>
                 </div>
-            </div>
 
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable 
-                    droppableId="todo-list" 
-                    isDropDisabled={!canEdit}
-                    isCombineEnabled={false}
-                    ignoreContainerClipping={false}
-                >
-                    {(provided, snapshot) => (
-                        <div
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            className={`space-y-3 min-h-[300px] rounded-xl p-6 transition-all duration-200
-                                ${snapshot.isDraggingOver 
-                                    ? 'bg-gradient-to-br from-blue-50/50 to-blue-100/50 border-2 border-blue-200 shadow-inner' 
-                                    : 'bg-white/50 backdrop-blur-sm border border-gray-100'}`}
-                        >
-                            {todoList.items.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-[300px] text-gray-400">
-                                    <div className="relative">
-                                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur opacity-25"></div>
-                                        <div className="relative bg-white rounded-lg p-6">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                            </svg>
-                                            <p className="text-xl font-medium text-gray-700">No tasks yet</p>
-                                            {canEdit && (
-                                                <p className="text-sm text-gray-500 mt-2">Start by adding your first task below</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                todoList.items
-                                    .sort((a, b) => a.order - b.order)
-                                    .map((item, index) => (
-                                        <Draggable
-                                            key={item.id}
-                                            draggableId={item.id}
-                                            index={index}
-                                            isDragDisabled={!canEdit}
-                                        >
-                                            {(provided) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                >
-                                                    <TodoItemComponent
-                                                        item={item}
-                                                        index={index}
-                                                        isEditable={canEdit}
-                                                        onToggleComplete={(id) => {
-                                                            const updatedItem = todoList.items.find(item => item.id === id);
-                                                            if (updatedItem) {
-                                                                handleItemUpdate({
-                                                                    ...updatedItem,
-                                                                    completed: !updatedItem.completed
-                                                                });
-                                                            }
-                                                        }}
-                                                        onEdit={(id, content) => {
-                                                            const updatedItem = todoList.items.find(item => item.id === id);
-                                                            if (updatedItem) {
-                                                                handleItemUpdate({
-                                                                    ...updatedItem,
-                                                                    content
-                                                                });
-                                                            }
-                                                        }}
-                                                        onDelete={handleDeleteItem}
-                                                    />
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))
-                            )}
-                            {provided.placeholder}
+                {/* Todo Items */}
+                <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId="todo-list">
+                        {(provided) => (
+                            <div
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                                className="space-y-2"
+                            >
+                                {todoList.items.map((item, index) => (
+                                    <Draggable
+                                        key={item.id}
+                                        draggableId={item.id}
+                                        index={index}
+                                        isDragDisabled={!isEditable}
+                                    >
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                className={`${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                            >
+                                                <TodoItemComponent
+                                                    item={item}
+                                                    index={index}
+                                                    isEditable={isEditable}
+                                                    onUpdate={handleItemUpdate}
+                                                    onDelete={handleDeleteItem}
+                                                />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+
+                {/* Add Task Button */}
+                {isEditable && (
+                    <button
+                        onClick={handleAddItem}
+                        className="w-full mt-4 px-4 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors duration-200"
+                    >
+                        <div className="flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                            </svg>
+                            Add Task
                         </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
-
-            {canEdit && (
-                <button
-                    onClick={handleAddItem}
-                    className="group w-full py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700
-                        text-white rounded-xl shadow-lg hover:shadow-blue-500/25
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                        transform transition-all duration-200 hover:scale-[1.01] active:scale-100
-                        flex items-center justify-center space-x-2"
-                >
-                    <span className="absolute w-max bg-blue-700/50 backdrop-blur-sm text-white text-sm py-1 px-2 rounded-lg
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-200 -translate-y-10 group-hover:-translate-y-12">
-                        Press 'N' to add new task
-                    </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
-                    <span className="font-medium">Add New Task</span>
-                </button>
-            )}
+                    </button>
+                )}
+            </div>
         </div>
     );
 } 
