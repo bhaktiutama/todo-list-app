@@ -81,8 +81,8 @@ export default function TodoPage() {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading todo list...</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto dark:border-blue-400"></div>
+                    <p className="mt-4 text-slate-600 dark:text-slate-400">Loading todo list...</p>
                 </div>
             </div>
         );
@@ -91,7 +91,7 @@ export default function TodoPage() {
     if (error || !todoList) {
         return (
             <div className="flex min-h-screen items-center justify-center p-4">
-                <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded max-w-md w-full">
+                <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700/50 text-red-700 dark:text-red-400 px-6 py-4 rounded max-w-md w-full">
                     <h2 className="text-lg font-semibold mb-2">Error</h2>
                     <p>{error || 'Todo list not found'}</p>
                 </div>
@@ -100,26 +100,26 @@ export default function TodoPage() {
     }
 
     const isEditable = !!editToken;
-    const expiresIn = new Date(todoList.expires_at).getTime() - Date.now();
+    const expiresIn = todoList.expires_at ? new Date(todoList.expires_at).getTime() - Date.now() : 0;
     const expiresInHours = Math.max(0, Math.floor(expiresIn / (1000 * 60 * 60)));
     const expiresInMinutes = Math.max(0, Math.floor((expiresIn % (1000 * 60 * 60)) / (1000 * 60)));
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30">
+        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30">
             {/* Background Pattern */}
-            <div className="fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50" />
+            <div className="fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]" />
             
             <div className="relative min-h-screen grid place-items-center p-4">
-                <div className="w-full max-w-3xl backdrop-blur-xl bg-white/80 rounded-2xl shadow-glass-lg border border-white/20">
+                <div className="w-full max-w-3xl backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-glass-lg border border-white/20 dark:border-white/10">
                     {/* Header Section */}
-                    <div className="relative px-6 py-5 border-b border-slate-200/50">
+                    <div className="relative px-6 py-5 border-b border-slate-200/50 dark:border-slate-700/50">
                         <div className="grid gap-4">
                             <div className="flex items-center justify-between">
-                                <h1 className="text-2xl font-semibold text-slate-900">
+                                <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
                                     {isEditable ? 'Edit Todo List' : 'View Todo List'}
                                 </h1>
                                 <div className="flex items-center gap-2">
-                                    <div className="flex items-center px-3 py-1.5 bg-orange-50/80 text-orange-700 rounded-full border border-orange-200/50">
+                                    <div className="flex items-center px-3 py-1.5 bg-orange-50/80 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200/50 dark:border-orange-700/50">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                                         </svg>
@@ -134,7 +134,7 @@ export default function TodoPage() {
 
                     {/* Notifications */}
                     {saveError && (
-                        <div className="mx-6 mt-4 bg-red-50/80 border border-red-200/50 text-red-700 px-4 py-3 rounded-lg flex items-center text-sm">
+                        <div className="mx-6 mt-4 bg-red-50/80 dark:bg-red-900/30 border border-red-200/50 dark:border-red-700/50 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg flex items-center text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
@@ -143,7 +143,7 @@ export default function TodoPage() {
                     )}
 
                     {copySuccess && (
-                        <div className="mx-6 mt-4 bg-green-50/80 border border-green-200/50 text-green-700 px-4 py-3 rounded-lg flex items-center text-sm">
+                        <div className="mx-6 mt-4 bg-green-50/80 dark:bg-green-900/30 border border-green-200/50 dark:border-green-700/50 text-green-700 dark:text-green-400 px-4 py-3 rounded-lg flex items-center text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
@@ -157,7 +157,7 @@ export default function TodoPage() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 {/* View Link */}
                                 <div className="space-y-2">
-                                    <label className="block text-xs font-medium text-slate-700">View Link</label>
+                                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">View Link</label>
                                     <div className="group relative">
                                         <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
                                         <div className="relative flex">
@@ -165,7 +165,7 @@ export default function TodoPage() {
                                                 type="text"
                                                 value={viewUrl}
                                                 readOnly
-                                                className="flex-1 px-3 py-2 text-sm bg-white/90 border border-slate-200/50 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                                className="flex-1 px-3 py-2 text-sm bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                                             />
                                             <button
                                                 onClick={() => handleCopyLink(viewUrl, 'view')}
@@ -180,7 +180,7 @@ export default function TodoPage() {
                                 {/* Edit Link */}
                                 {isEditable && (
                                     <div className="space-y-2">
-                                        <label className="block text-xs font-medium text-slate-700">Edit Link</label>
+                                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">Edit Link</label>
                                         <div className="group relative">
                                             <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
                                             <div className="relative flex">
@@ -188,7 +188,7 @@ export default function TodoPage() {
                                                     type="text"
                                                     value={editUrl}
                                                     readOnly
-                                                    className="flex-1 px-3 py-2 text-sm bg-white/90 border border-slate-200/50 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                                                    className="flex-1 px-3 py-2 text-sm bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-purple-500/50"
                                                 />
                                                 <button
                                                     onClick={() => handleCopyLink(editUrl, 'edit')}
@@ -216,22 +216,14 @@ export default function TodoPage() {
                     </div>
 
                     {/* Todo List Component */}
-                    <div className="px-6 pb-6">
+                    <div className="p-6 pt-0">
                         <TodoList
                             todoList={todoList}
-                            clientId={editToken || ''}
-                            canEdit={isEditable}
+                            isEditable={isEditable}
                             onUpdate={handleUpdateTodoList}
+                            isSaving={isSaving}
                         />
                     </div>
-
-                    {/* Saving Indicator */}
-                    {isSaving && (
-                        <div className="fixed bottom-6 right-6 flex items-center bg-slate-900/90 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm text-sm">
-                            <div className="animate-spin rounded-full h-3.5 w-3.5 border border-white/30 border-t-white mr-2"></div>
-                            <span className="font-medium">Saving changes...</span>
-                        </div>
-                    )}
                 </div>
             </div>
         </main>
