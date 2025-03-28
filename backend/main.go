@@ -34,7 +34,7 @@ func main() {
 	go api.Manager.Start()
 
 	app := fiber.New(fiber.Config{
-		AppName: "Todo List App",
+		AppName: "Todo List Pastebin",
 	})
 
 	// Middleware
