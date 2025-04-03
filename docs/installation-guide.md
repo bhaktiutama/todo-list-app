@@ -59,44 +59,11 @@ Dokumen ini berisi instruksi langkah demi langkah untuk menginstal dan menjalank
    PORT=8080
    CORS_ORIGIN=http://localhost:3000
    WEBSOCKET_ENABLED=true
-   ENVIRONMENT=development
-   LOG_LEVEL=info
    ```
 
-5. **Instalasi Air (opsional untuk hot reload)**
+5. **Jalankan backend**
 
    ```bash
-   # Menggunakan Homebrew (macOS)
-   brew install cosmtrek/tools/air
-
-   # Menggunakan Go
-   go install github.com/cosmtrek/air@latest
-   ```
-
-   Buat file `.air.toml` di folder `backend` (jika belum ada):
-
-   ```toml
-   root = "."
-   tmp_dir = "tmp"
-
-   [build]
-   cmd = "go build -o ./tmp/main ."
-   bin = "./tmp/main"
-   include_ext = ["go", "tpl", "tmpl", "html"]
-   exclude_dir = ["assets", "tmp", "vendor"]
-   delay = 1000 # ms
-
-   [screen]
-   clear_on_rebuild = true
-   ```
-
-6. **Jalankan backend**
-
-   ```bash
-   # Dengan hot reload (jika air terinstal)
-   air
-
-   # Atau jalankan langsung
    go run main.go
    ```
 
@@ -125,7 +92,6 @@ Dokumen ini berisi instruksi langkah demi langkah untuk menginstal dan menjalank
    ```
    NEXT_PUBLIC_API_URL=http://localhost:8080
    NEXT_PUBLIC_ENABLE_WEBSOCKET=true
-   NEXT_PUBLIC_DEBUG=true
    ```
 
 4. **Jalankan server pengembangan**
@@ -211,8 +177,6 @@ Jika WebSocket tidak tersambung:
    PORT=8080
    CORS_ORIGIN=https://your-frontend-domain.com
    WEBSOCKET_ENABLED=true
-   ENVIRONMENT=production
-   LOG_LEVEL=error
    ```
 
 4. **Jalankan dengan process manager (contoh dengan PM2)**

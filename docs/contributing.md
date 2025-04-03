@@ -31,25 +31,20 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
 
 1. **Formatting**:
 
-   - Gunakan `gofmt` atau `goimports` untuk memformat kode.
+   - Gunakan `gofmt` untuk memformat kode.
    - Jalankan: `go fmt ./...` sebelum commit.
 
-2. **Linting**:
-
-   - Gunakan `golint` dan `go vet` untuk memeriksa kode.
-   - Jalankan: `golint ./...` dan `go vet ./...` sebelum commit.
-
-3. **Testing**:
+2. **Testing**:
 
    - Tulis unit test untuk kode baru.
    - Pastikan semua test lulus: `go test ./...`
 
-4. **Penanganan Error**:
+3. **Penanganan Error**:
 
    - Selalu periksa dan tangani error.
    - Gunakan log level yang sesuai untuk error.
 
-5. **Dokumentasi**:
+4. **Dokumentasi**:
    - Tambahkan komentar untuk fungsi publik mengikuti standar GoDoc.
 
 ### TypeScript/JavaScript (Frontend)
@@ -64,17 +59,12 @@ Ikuti panduan instalasi di [docs/installation-guide.md](installation-guide.md) u
    - Gunakan ESLint untuk memeriksa kode.
    - Jalankan: `npm run lint` sebelum commit.
 
-3. **Testing**:
-
-   - Tulis unit test untuk komponen React.
-   - Pastikan semua test lulus: `npm run test`
-
-4. **Nama Komponen**:
+3. **Nama Komponen**:
 
    - Gunakan PascalCase untuk nama komponen React.
    - Gunakan camelCase untuk fungsi dan variabel.
 
-5. **CSS/Styling**:
+4. **CSS/Styling**:
    - Gunakan Tailwind CSS class sesuai dengan desain sistem.
    - Hindari inline CSS kecuali sangat diperlukan.
 
@@ -146,8 +136,7 @@ Jika Anda ingin menambahkan fitur baru yang signifikan:
 
 1. Buat file komponen di `frontend/src/components/`.
 2. Tambahkan type definitions di `frontend/src/types/`.
-3. Uji komponen dengan unit test.
-4. Integrasikan dengan komponen lain sesuai kebutuhan.
+3. Integrasikan dengan komponen lain sesuai kebutuhan.
 
 ## Proyek Roadmap
 
@@ -171,11 +160,6 @@ Kami selalu mencari kontribusi untuk area berikut:
    - Due dates
    - Prioritas tugas
 
-4. **Infrastruktur**:
-   - CI/CD improvements
-   - Containerization
-   - Deployment scripts
-
 ## Kebijakan Perilisan
 
 1. **Versioning** mengikuti [Semantic Versioning](https://semver.org/).
@@ -187,7 +171,7 @@ Kami selalu mencari kontribusi untuk area berikut:
 Jika Anda memiliki pertanyaan atau butuh bantuan:
 
 - **GitHub Issues**: Buka issue baru dengan tag "question".
-- **Email**: Hubungi maintainer di email@example.com.
+- **Email**: Hubungi maintainer di bhakti.utama@gmail.com.
 
 ## Code of Conduct
 

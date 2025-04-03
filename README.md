@@ -22,7 +22,6 @@ Aplikasi Todo List yang dapat dibagikan, dibangun dengan Go dan Next.js, terinsp
 - **Fiber**: Framework web yang cepat dan ringan
 - **Redis**: Database untuk penyimpanan daftar tugas
 - **WebSocket**: Untuk pembaruan real-time
-- **Air**: Untuk hot-reloading selama pengembangan
 
 ### Frontend
 
@@ -99,10 +98,6 @@ WEBSOCKET_ENABLED=true
 4. Jalankan backend:
 
 ```bash
-# Untuk pengembangan dengan hot-reload (jika air terinstal)
-air
-
-# Atau, jalankan secara normal
 go run main.go
 ```
 
@@ -230,54 +225,6 @@ curl -X PUT http://localhost:8080/api/v1/todos/[id]?editToken=[token] \
   }'
 ```
 
-## Deployment
-
-### Backend (Go)
-
-#### Menggunakan Docker
-
-```bash
-# Build Docker image
-docker build -t todo-list-backend ./backend
-
-# Run container
-docker run -p 8080:8080 --env-file ./backend/.env todo-list-backend
-```
-
-#### Menggunakan Railway/Heroku
-
-1. Pastikan `Procfile` tersedia di folder `backend`:
-
-```
-web: ./main
-```
-
-2. Deploy dengan perintah CLI platform atau melalui GitHub integration
-
-### Frontend (Next.js)
-
-#### Menggunakan Vercel
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-cd frontend
-vercel
-```
-
-#### Menggunakan Netlify/Firebase
-
-1. Buat build production:
-
-```bash
-cd frontend
-npm run build
-```
-
-2. Deploy folder `out` ke layanan hosting pilihan Anda
-
 ## Troubleshooting
 
 ### Masalah Umum dan Solusi
@@ -300,56 +247,6 @@ npm run build
 4. **Changes Not Syncing in Real-time**
    - Periksa koneksi WebSocket di console browser
    - Pastikan `clientId` dikirimkan dengan benar saat menginisialisasi koneksi WebSocket
-
-### Logging dan Debugging
-
-#### Backend
-
-```bash
-# Jalankan dengan level log verbose
-LOG_LEVEL=debug go run main.go
-```
-
-#### Frontend
-
-```bash
-# Aktifkan logging development
-NEXT_PUBLIC_DEBUG=true npm run dev
-```
-
-## Pengembangan
-
-### Menambahkan Fitur Baru
-
-1. Fork repository
-2. Buat branch baru: `git checkout -b feature/my-new-feature`
-3. Commit perubahan: `git commit -am 'Add new feature'`
-4. Push ke branch: `git push origin feature/my-new-feature`
-5. Submit pull request
-
-### Kustomisasi Tampilan
-
-Aplikasi menggunakan Tailwind CSS yang dapat dikustomisasi melalui file `tailwind.config.js` di direktori frontend:
-
-```js
-// Contoh kustomisasi tema
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: '#f0f9ff',
-          // ... custom colors
-        },
-      },
-    },
-  },
-};
-```
-
-## Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
 
 ## Kontak
 
