@@ -9,7 +9,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 ### Added
 
 - Integrasi dengan Supabase sebagai alternatif backend
-- Implementasi Row Level Security (RLS) untuk keamanan data
 - Dukungan multi-user pada daftar tugas
 - Sistem factory pattern untuk mendukung beberapa backend API
 
@@ -29,7 +28,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 ### Added
 
 - Versi awal aplikasi Todo List
-- Fitur drag-and-drop untuk menyusun ulang tugas
 - Berbagi daftar tugas melalui URL unik
 - Otentikasi sederhana dengan token edit
 - Websocket untuk pembaruan real-time

@@ -107,6 +107,11 @@ Dokumen ini berisi instruksi langkah demi langkah untuk menginstal dan menjalank
      created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
      completed_at TIMESTAMP WITH TIME ZONE
    );
+
+   -- Buat index untuk meningkatkan performa query
+   CREATE INDEX idx_todo_items_todo_list_id ON public.todo_items(todo_list_id);
+   CREATE INDEX idx_todo_lists_user_id ON public.todo_lists(user_id);
+   CREATE INDEX idx_todo_lists_expires_at ON public.todo_lists(expires_at);
    ```
 
 3. **Setup Row Level Security (RLS)**
@@ -252,7 +257,11 @@ Jika mengalami error saat menambahkan task baru:
 invalid input syntax for type uuid: "temp-1234567890"
 ```
 
-Hal ini terjadi karena saat menambahkan task baru, frontend membuat ID sementara yang tidak sesuai dengan format UUID yang diharapkan Supabase. Pastikan Anda menggunakan versi terbaru aplikasi yang telah memperbaiki masalah ini.
+Aplikasi sekarang menangani ID sementara dengan lebih baik menggunakan format `temp-{index}` untuk item yang belum memiliki ID permanen. Jika Anda masih mengalami masalah ini:
+
+1. Pastikan Anda menggunakan versi terbaru aplikasi
+2. Periksa bahwa `NEXT_PUBLIC_BACKEND_PROVIDER` di `.env` sesuai dengan backend yang Anda gunakan (`go` atau `supabase`)
+3. Jika menggunakan Supabase, pastikan tabel `todo_items` mengizinkan UUID null atau memiliki nilai default
 
 ### CORS Errors
 
@@ -311,10 +320,9 @@ Jika WebSocket tidak tersambung:
 
 Untuk deployment produksi dengan Supabase:
 
-1. **Pastikan RLS policies dikonfigurasi dengan benar**
-2. **Pertimbangkan untuk mengaktifkan fitur backup data**
-3. **Setup Supabase Edge Functions jika diperlukan untuk logika server**
-4. **Catat URL produksi dan anon key untuk konfigurasi frontend**
+1. **Pertimbangkan untuk mengaktifkan fitur backup data**
+2. **Setup Supabase Edge Functions jika diperlukan untuk logika server**
+3. **Catat URL produksi dan anon key untuk konfigurasi frontend**
 
 ### Frontend (Next.js)
 

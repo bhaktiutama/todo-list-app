@@ -68,7 +68,6 @@ todo-list-app/
 **Versi 1.1.0**
 
 - Integrasi dengan Supabase sebagai backend alternatif
-- Implementasi Row Level Security (RLS) untuk keamanan data
 - Factory pattern untuk memilih provider backend
 - Perbaikan bug pada penanganan item baru dengan ID temporary
 - Lihat [CHANGELOG.md](docs/CHANGELOG.md) untuk rincian lengkap

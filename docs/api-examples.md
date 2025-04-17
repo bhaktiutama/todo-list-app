@@ -354,25 +354,29 @@ DELETE /rest/v1/todo_items?id=eq.item-3
 apikey: [your-anon-key]
 ```
 
-## Row Level Security (RLS)
+## Keamanan
 
-Ketika menggunakan Supabase Backend, aplikasi ini mengimplementasikan Row Level Security (RLS) untuk memastikan pengguna hanya dapat melihat dan mengubah data mereka sendiri.
+### Token Edit
 
-### Kebijakan RLS
+Setiap daftar tugas memiliki token edit yang unik. Token ini diperlukan untuk operasi yang mengubah data:
 
-Todo Lists:
+```typescript
+// Contoh URL dengan token edit
+const editUrl = `${baseUrl}/todo/${todoId}?token=${editToken}`;
+```
 
-1. Pengguna yang terotentikasi dapat melihat todo_lists miliknya sendiri
-2. Pengguna yang terotentikasi dapat membuat todo_lists baru dan otomatis menjadi pemiliknya
-3. Pengguna yang terotentikasi dapat mengupdate dan menghapus todo_lists miliknya sendiri
+### Validasi Token
 
-Todo Items:
+Server akan memvalidasi token edit untuk setiap request yang mengubah data:
 
-1. Pengguna yang terotentikasi dapat melihat todo_items yang terkait dengan todo_lists miliknya
-2. Pengguna yang terotentikasi dapat membuat todo_items baru untuk todo_lists miliknya
-3. Pengguna yang terotentikasi dapat mengupdate dan menghapus todo_items dalam todo_lists miliknya
+```typescript
+// Contoh validasi token di backend
+if (!isValidToken(todoId, editToken)) {
+  return res.status(403).json({ error: 'Invalid edit token' });
+}
+```
 
-## WebSocket Events
+## Websocket
 
 ### Connect
 

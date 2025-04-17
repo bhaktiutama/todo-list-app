@@ -35,66 +35,6 @@ CREATE INDEX idx_todo_lists_user_id ON public.todo_lists(user_id);
 CREATE INDEX idx_todo_lists_expires_at ON public.todo_lists(expires_at);
 ```
 
-### 2. Setup Row Level Security (RLS)
-
-Aktifkan RLS pada kedua tabel:
-
-```sql
--- Aktifkan RLS
-ALTER TABLE public.todo_lists ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.todo_items ENABLE ROW LEVEL SECURITY;
-
--- Buat kebijakan untuk todo_lists
-CREATE POLICY "Pengguna dapat melihat todo_lists mereka sendiri" ON public.todo_lists
-FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Pengguna dapat membuat todo_lists" ON public.todo_lists
-FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Pengguna dapat mengupdate todo_lists mereka sendiri" ON public.todo_lists
-FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Pengguna dapat menghapus todo_lists mereka sendiri" ON public.todo_lists
-FOR DELETE USING (auth.uid() = user_id);
-
--- Buat kebijakan untuk todo_items
-CREATE POLICY "Pengguna dapat melihat todo_items dari todo_lists mereka" ON public.todo_items
-FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM public.todo_lists
-    WHERE todo_lists.id = todo_items.todo_list_id
-    AND todo_lists.user_id = auth.uid()
-  )
-);
-
-CREATE POLICY "Pengguna dapat membuat todo_items dalam todo_lists mereka" ON public.todo_items
-FOR INSERT WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.todo_lists
-    WHERE todo_lists.id = todo_items.todo_list_id
-    AND todo_lists.user_id = auth.uid()
-  )
-);
-
-CREATE POLICY "Pengguna dapat mengupdate todo_items dalam todo_lists mereka" ON public.todo_items
-FOR UPDATE USING (
-  EXISTS (
-    SELECT 1 FROM public.todo_lists
-    WHERE todo_lists.id = todo_items.todo_list_id
-    AND todo_lists.user_id = auth.uid()
-  )
-);
-
-CREATE POLICY "Pengguna dapat menghapus todo_items dalam todo_lists mereka" ON public.todo_items
-FOR DELETE USING (
-  EXISTS (
-    SELECT 1 FROM public.todo_lists
-    WHERE todo_lists.id = todo_items.todo_list_id
-    AND todo_lists.user_id = auth.uid()
-  )
-);
-```
-
 ## Konfigurasi Frontend
 
 ### 1. Buat file `lib/supabase.ts` di folder frontend
