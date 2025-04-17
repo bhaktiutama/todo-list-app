@@ -123,7 +123,7 @@ export function TodoItem({ item, index, isEditable, onUpdate, onDelete }: TodoIt
             <div
               onClick={handleEdit}
               className={`flex-1 py-1 px-2 -ml-2 rounded
-                                ${item.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} 
+                                ${item.completed ? 'line-through text-slate-400 dark:text-slate-400' : 'text-slate-700 dark:text-slate-200'} 
                                 ${isEditable ? 'hover:bg-white/50 dark:hover:bg-slate-700/50 cursor-pointer' : ''}
                                 transition-all duration-200 ease-in-out`}
             >
