@@ -2,6 +2,8 @@
 
 Aplikasi Todo List yang dapat dibagikan, dibangun dengan Go/Supabase dan Next.js, terinspirasi oleh Pastebin. Aplikasi ini memungkinkan pengguna untuk membuat, mengedit, dan berbagi daftar tugas tanpa perlu login. Dihasilkan dengan vibe coding menggunakan Cursor.ai.
 
+🚀 **Demo**: [https://todo-list-pastebin.vercel.app/](https://todo-list-pastebin.vercel.app/)
+
 ![Todo List Pastebin Screenshot](docs/screenshot.png)
 
 ## Fitur
