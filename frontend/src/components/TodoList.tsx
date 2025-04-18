@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { TodoItem as TodoItemComponent } from './TodoItem';
 import { TodoItem as TodoItemType, TodoList as TodoListType } from '../types/todo';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -68,42 +67,6 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
       setIsPolling(false);
     };
   }, [isWebSocketEnabled, todoList.id, isEditable]);
-
-  const handleDragEnd = async (result: any) => {
-    console.log('DragEnd event triggered:', result);
-
-    if (!result.destination) {
-      console.log('No destination provided, skipping update');
-      return;
-    }
-
-    if (!isEditable) {
-      console.log('List is not editable, skipping update');
-      return;
-    }
-
-    console.log('Current items:', todoList.items);
-    const items = Array.from(todoList.items);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    // Update order property for each item
-    const updatedItems = items.map((item, index) => ({
-      ...item,
-      order: index,
-    }));
-
-    console.log('Updated items:', updatedItems);
-
-    const updatedTodoList = {
-      ...todoList,
-      items: updatedItems,
-    };
-
-    console.log('Setting new todo list:', updatedTodoList);
-    setTodoList(updatedTodoList);
-    await onUpdate(updatedTodoList);
-  };
 
   const handleItemUpdate = async (updatedItem: TodoItemType) => {
     if (!isEditable) return;
@@ -201,76 +164,15 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
         </div>
 
         {/* Todo Items */}
-        <DragDropContext
-          onDragStart={(start) => {
-            console.log('Drag started:', start);
-            // Disable polling and websocket updates while dragging
-            setIsPolling(false);
-          }}
-          onDragEnd={async (result) => {
-            console.log('DragEnd event triggered:', result);
-
-            if (!result.destination) {
-              console.log('No destination provided, skipping update');
-              return;
-            }
-
-            if (!isEditable) {
-              console.log('List is not editable, skipping update');
-              return;
-            }
-
-            console.log('Current items:', todoList.items);
-            const items = Array.from(todoList.items);
-            const [reorderedItem] = items.splice(result.source.index, 1);
-            items.splice(result.destination.index, 0, reorderedItem);
-
-            // Update order property for each item
-            const updatedItems = items.map((item, index) => ({
-              ...item,
-              order: index,
-            }));
-
-            console.log('Updated items:', updatedItems);
-
-            const updatedTodoList = {
-              ...todoList,
-              items: updatedItems,
-            };
-
-            console.log('Setting new todo list:', updatedTodoList);
-            setTodoList(updatedTodoList);
-            await onUpdate(updatedTodoList);
-          }}
-        >
-          <Droppable droppableId='todo-list' isDropDisabled={!isEditable} isCombineEnabled={false} ignoreContainerClipping={false}>
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef} className='space-y-2'>
-                {todoList.items.map((item, index) => {
-                  const itemId = item.id || `temp-${index}`;
-                  console.log(`Rendering draggable item ${index}:`, { id: itemId, item });
-                  return (
-                    <Draggable key={itemId} draggableId={itemId} index={index} isDragDisabled={!isEditable}>
-                      {(provided, snapshot) => {
-                        console.log(`Draggable render for item ${itemId}:`, { provided, snapshot });
-                        return (
-                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={provided.draggableProps.style} className={`${snapshot.isDragging ? 'opacity-50' : ''}`}>
-                            <TodoItemComponent item={item} index={index} isEditable={isEditable} onUpdate={handleItemUpdate} onDelete={handleDeleteItem} />
-                          </div>
-                        );
-                      }}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <div className='space-y-2'>
+          {todoList.items.map((item, index) => (
+            <TodoItemComponent key={item.id || `temp-${index}`} item={item} index={index} isEditable={isEditable} onUpdate={handleItemUpdate} onDelete={handleDeleteItem} />
+          ))}
+        </div>
 
         {/* Add Task Button */}
         {isEditable && (
-          <button onClick={handleAddItem} className='w-full mt-4 px-4 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors duration-200'>
+          <button onClick={handleAddItem} className='w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-200/50 dark:border-blue-700/50 text-blue-600 dark:text-blue-400 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50'>
             <div className='flex items-center justify-center'>
               <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 mr-2' viewBox='0 0 20 20' fill='currentColor'>
                 <path fillRule='evenodd' d='M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z' clipRule='evenodd' />
