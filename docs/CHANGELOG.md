@@ -4,6 +4,11 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 ## [Unreleased]
 
+### Changed
+
+- Memperbaiki tampilan indikator auto-saving agar hanya muncul pada mode edit
+- Meningkatkan perilaku sinkronisasi agar tetap berjalan pada mode edit dengan mencegah konflik perubahan lokal
+
 ## [1.1.0] - 2023-08-20
 
 ### Added
