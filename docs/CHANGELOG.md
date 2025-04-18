@@ -4,6 +4,11 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 ## [Unreleased]
 
+### Added
+
+- Fitur auto-focus pada item pertama saat membuat todo list baru
+- Fitur membuat task baru otomatis saat menekan Enter dengan auto-focus
+
 ### Changed
 
 - Memperbaiki tampilan indikator auto-saving agar hanya muncul pada mode edit

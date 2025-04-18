@@ -1,16 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { TodoItem, CreateTodoListRequest } from '../types/todo';
 import { todoApi } from '../services/api';
 
 export default function Home() {
   const router = useRouter();
+  const firstInputRef = useRef<HTMLInputElement>(null);
+  const lastInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<Omit<TodoItem, 'id' | 'created_at' | 'completed_at'>[]>([{ content: '', completed: false, order: 0 }]);
   const [expirationHours, setExpirationHours] = useState<number>(24);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto focus on first input when component mounts
+  useEffect(() => {
+    if (firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+  }, []);
+
+  // Auto focus on new item when added
+  useEffect(() => {
+    if (lastInputRef.current) {
+      lastInputRef.current.focus();
+    }
+  }, [items.length]);
 
   const handleAddItem = () => {
     setItems([...items, { content: '', completed: false, order: items.length }]);
@@ -27,6 +43,13 @@ export default function Home() {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], content };
     setItems(newItems);
+  };
+
+  const handleKeyPress = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && items[index].content.trim()) {
+      e.preventDefault();
+      handleAddItem();
+    }
   };
 
   const handleToggleComplete = (index: number) => {
@@ -88,7 +111,7 @@ export default function Home() {
             {items.map((item, index) => (
               <div key={index} className='flex items-center mb-2 group'>
                 <input type='checkbox' checked={item.completed} onChange={() => handleToggleComplete(index)} className='mr-2 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500/50 dark:focus:ring-blue-400/50' />
-                <input type='text' value={item.content} onChange={(e) => handleItemChange(index, e.target.value)} placeholder='Enter a task...' className='flex-1 p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50' />
+                <input type='text' ref={index === 0 ? firstInputRef : index === items.length - 1 ? lastInputRef : null} value={item.content} onChange={(e) => handleItemChange(index, e.target.value)} onKeyDown={(e) => handleKeyPress(index, e)} placeholder='Enter a task...' className='flex-1 p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50' />
                 <button onClick={() => handleRemoveItem(index)} className='ml-2 text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity' disabled={items.length <= 1}>
                   <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
                     <path fillRule='evenodd' d='M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z' clipRule='evenodd' />
