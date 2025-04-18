@@ -8,6 +8,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 - Fitur auto-focus pada item pertama saat membuat todo list baru
 - Fitur membuat task baru otomatis saat menekan Enter dengan auto-focus
+- Fitur navigasi antar task menggunakan Enter di mode edit
 
 ### Changed
 

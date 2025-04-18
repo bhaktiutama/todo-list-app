@@ -16,7 +16,7 @@ const ThemeToggle = dynamic(() => import('@/components/ThemeToggle'), {
 });
 
 export function TodoItem({ item, index, isEditable, onUpdate, onDelete }: TodoItemProps) {
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(!item.content && isEditable);
   const [editContent, setEditContent] = React.useState(item.content);
   const [isHovered, setIsHovered] = React.useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -26,7 +26,14 @@ export function TodoItem({ item, index, isEditable, onUpdate, onDelete }: TodoIt
       if (!isEditable) return;
 
       if (e.key === 'Enter' && isEditing) {
-        handleSave();
+        e.preventDefault();
+        // Simulate Tab press
+        const nextInput = document.querySelector(`input[type="text"]:not(:focus)`);
+        if (nextInput instanceof HTMLElement) {
+          nextInput.focus();
+        } else {
+          handleSave();
+        }
       } else if (e.key === 'Escape' && isEditing) {
         setEditContent(item.content);
         setIsEditing(false);
