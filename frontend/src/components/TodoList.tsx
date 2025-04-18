@@ -15,6 +15,7 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   const [todoList, setTodoList] = useState<TodoListType>(initialTodoList);
   const [isPolling, setIsPolling] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const isWebSocketEnabled = process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET === 'true';
 
   // Update local state when initialTodoList changes
@@ -31,8 +32,8 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   const { isConnected } = useWebSocket({
     todoId: todoList.id,
     onUpdate: (updatedTodoList) => {
-      if (!isEditable) {
-        // Only update if not in edit mode
+      if (!isEditing) {
+        // Only update if not actively editing
         setTodoList(updatedTodoList);
         setIsSyncing(false);
       }
@@ -41,19 +42,21 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
 
   // Polling when WebSocket is disabled
   useEffect(() => {
-    if (isWebSocketEnabled || isEditable) {
+    if (isWebSocketEnabled) {
       setIsPolling(false);
       return;
     }
 
     setIsPolling(true);
-    console.log('Starting polling (WebSocket disabled)');
+    console.log('Starting polling');
 
     const pollInterval = setInterval(async () => {
       try {
-        setIsSyncing(true);
-        const data = await todoApi.getTodoList(todoList.id);
-        setTodoList(data);
+        if (!isEditing) {
+          setIsSyncing(true);
+          const data = await todoApi.getTodoList(todoList.id);
+          setTodoList(data);
+        }
       } catch (error) {
         console.error('Error polling todo list:', error);
       } finally {
@@ -66,11 +69,12 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
       clearInterval(pollInterval);
       setIsPolling(false);
     };
-  }, [isWebSocketEnabled, todoList.id, isEditable]);
+  }, [isWebSocketEnabled, todoList.id, isEditing]);
 
   const handleItemUpdate = async (updatedItem: TodoItemType) => {
     if (!isEditable) return;
 
+    setIsEditing(true);
     const updatedItems = todoList.items.map((item) => (item.id === updatedItem.id ? updatedItem : item));
 
     const updatedTodoList = {
@@ -79,12 +83,14 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
     };
 
     setTodoList(updatedTodoList);
-    onUpdate(updatedTodoList);
+    await onUpdate(updatedTodoList);
+    setIsEditing(false);
   };
 
   const handleAddItem = async () => {
     if (!isEditable) return;
 
+    setIsEditing(true);
     const newItem: TodoItemType = {
       id: `temp-${Date.now()}`,
       content: '',
@@ -99,12 +105,14 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
     };
 
     setTodoList(updatedTodoList);
-    onUpdate(updatedTodoList);
+    await onUpdate(updatedTodoList);
+    setIsEditing(false);
   };
 
   const handleDeleteItem = async (itemId: string) => {
     if (!isEditable) return;
 
+    setIsEditing(true);
     const updatedItems = todoList.items
       .filter((item) => item.id !== itemId)
       .map((item, index) => ({
@@ -118,7 +126,8 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
     };
 
     setTodoList(updatedTodoList);
-    onUpdate(updatedTodoList);
+    await onUpdate(updatedTodoList);
+    setIsEditing(false);
   };
 
   return (
@@ -139,7 +148,7 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
                 <span className='text-sm font-medium'>Syncing</span>
               </div>
             )}
-            {isPolling && !isSaving && !isSyncing && (
+            {isPolling && !isSaving && !isSyncing && isEditable && (
               <div className='px-3 py-1 bg-green-50/80 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center'>
                 <div className='w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 mr-2 animate-pulse'></div>
                 <span className='text-sm font-medium'>Auto-saving</span>
