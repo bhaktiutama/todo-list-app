@@ -108,12 +108,14 @@ Lihat [docs/installation-guide.md](docs/installation-guide.md) untuk instruksi d
 1. Clone repository
 2. Setup backend (Go atau Supabase)
 3. Setup frontend:
-   ```bash
-   cd frontend
-   npm install
+
+```bash
+cd frontend
+npm install
    # Konfigurasi .env.local
-   npm run dev
-   ```
+npm run dev
+```
+
 4. Buka http://localhost:3000
 
 ## Penggunaan

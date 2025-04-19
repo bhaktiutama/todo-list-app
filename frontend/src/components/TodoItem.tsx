@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { TodoItem as TodoItemType } from '../types/todo';
+import { Priority } from '../types/priority';
+import { PriorityIndicator } from './priority/PriorityIndicator';
+import { PrioritySelector } from './priority/PrioritySelector';
 import dynamic from 'next/dynamic';
 
 interface TodoItemProps {
@@ -69,6 +72,13 @@ export function TodoItem({ item, index, isEditable, onUpdate, onDelete }: TodoIt
     });
   };
 
+  const handlePriorityChange = (newPriority: Priority) => {
+    onUpdate({
+      ...item,
+      priority: newPriority,
+    });
+  };
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
@@ -91,31 +101,36 @@ export function TodoItem({ item, index, isEditable, onUpdate, onDelete }: TodoIt
         />
       </div>
 
-      {isEditing ? (
-        <input
-          ref={inputRef}
-          type='text'
-          value={editContent}
-          onChange={(e) => setEditContent(e.target.value)}
-          onBlur={handleSave}
-          className='flex-1 p-2 bg-transparent border-b-2 border-blue-500 dark:border-blue-400
+      <div className='flex-1 flex items-center space-x-4'>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type='text'
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            onBlur={handleSave}
+            className='flex-1 p-2 bg-transparent border-b-2 border-blue-500 dark:border-blue-400
                         focus:outline-none focus:border-blue-700 dark:focus:border-blue-300
                         transition-all duration-200 ease-in-out
                         text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500'
-          autoFocus
-          placeholder='What needs to be done?'
-        />
-      ) : (
-        <div
-          onClick={handleEdit}
-          className={`flex-1 py-1 px-2 -ml-2 rounded
+            autoFocus
+            placeholder='What needs to be done?'
+          />
+        ) : (
+          <>
+            <div
+              onClick={handleEdit}
+              className={`flex-1 py-1 px-2 -ml-2 rounded
                         ${item.completed ? 'line-through text-slate-400 dark:text-slate-200' : 'text-slate-700 dark:text-slate-200'} 
                         ${isEditable ? 'hover:bg-white/50 dark:hover:bg-slate-700/50 cursor-pointer' : ''}
                         transition-all duration-200 ease-in-out`}
-        >
-          {item.content}
-        </div>
-      )}
+            >
+              {item.content}
+            </div>
+            {isEditable ? <div className='flex items-center gap-2'>{isHovered ? <PrioritySelector value={item.priority} onChange={handlePriorityChange} className='w-32' /> : <PriorityIndicator priority={item.priority} />}</div> : <PriorityIndicator priority={item.priority} />}
+          </>
+        )}
+      </div>
 
       {isEditable && (
         <div

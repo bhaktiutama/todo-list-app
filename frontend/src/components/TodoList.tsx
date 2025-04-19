@@ -97,6 +97,7 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
       completed: false,
       order: todoList.items.length,
       created_at: new Date().toISOString(),
+      priority: 'medium',
     };
 
     const updatedTodoList = {

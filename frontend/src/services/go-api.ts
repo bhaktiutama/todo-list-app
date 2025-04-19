@@ -5,12 +5,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export class GoTodoApi implements TodoApiService {
   async createTodoList(request: CreateTodoListRequest): Promise<CreateTodoListResponse> {
+    // Ensure items have priority field
+    const itemsWithPriority = request.items?.map((item) => ({
+      ...item,
+      priority: item.priority || 'medium',
+    }));
+
     const response = await fetch(`${API_BASE_URL}/api/v1/todos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify({
+        ...request,
+        items: itemsWithPriority,
+      }),
     });
 
     if (!response.ok) {
@@ -31,12 +40,21 @@ export class GoTodoApi implements TodoApiService {
   }
 
   async updateTodoList(id: string, editToken: string, request: UpdateTodoListRequest): Promise<TodoList> {
+    // Ensure items have priority field
+    const itemsWithPriority = request.items?.map((item) => ({
+      ...item,
+      priority: item.priority || 'medium',
+    }));
+
     const response = await fetch(`${API_BASE_URL}/api/v1/todos/${id}?token=${editToken}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify({
+        ...request,
+        items: itemsWithPriority,
+      }),
     });
 
     if (!response.ok) {

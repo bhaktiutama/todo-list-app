@@ -1,3 +1,5 @@
+import { Priority } from './priority';
+
 export interface TodoItem {
   id?: string;
   content: string;
@@ -5,6 +7,7 @@ export interface TodoItem {
   order: number;
   created_at?: string;
   completed_at?: string | null;
+  priority: Priority;
 }
 
 export interface TodoList {

@@ -27,6 +27,7 @@ export class SupabaseTodoApi implements TodoApiService {
           content: item.content,
           completed: item.completed,
           order: item.order,
+          priority: item.priority || 'medium', // Add default priority if not provided
         }))
       );
 
@@ -115,6 +116,7 @@ export class SupabaseTodoApi implements TodoApiService {
             completed: item.completed,
             order: item.order,
             completed_at: item.completed ? new Date().toISOString() : null,
+            priority: item.priority || 'medium', // Add priority field with default
           })
           .eq('id', item.id);
 
@@ -134,6 +136,7 @@ export class SupabaseTodoApi implements TodoApiService {
             content: item.content,
             completed: item.completed,
             order: item.order,
+            priority: item.priority || 'medium', // Add priority field with default
           }))
         );
 
