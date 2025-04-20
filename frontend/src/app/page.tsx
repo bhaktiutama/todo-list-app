@@ -6,12 +6,14 @@ import { TodoItem, CreateTodoListRequest } from '../types/todo';
 import { todoApi } from '../services/api';
 import { Priority } from '../types/priority';
 import { PrioritySelector } from '../components/priority/PrioritySelector';
+import { TagInput } from '../components/tag/TagInput';
 
 export default function Home() {
   const router = useRouter();
   const firstInputRef = useRef<HTMLInputElement>(null);
   const lastInputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<Omit<TodoItem, 'id' | 'created_at' | 'completed_at'>[]>([{ content: '', completed: false, order: 0, priority: 'medium' }]);
+  const [tags, setTags] = useState<string[]>([]);
   const [expirationHours, setExpirationHours] = useState<number>(24);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +82,7 @@ export default function Home() {
       const request: CreateTodoListRequest = {
         expiration_hours: expirationHours,
         items: items.filter((item) => item.content.trim()),
+        tags: tags.map((name) => ({ name })),
       };
 
       const response = await todoApi.createTodoList(request);
@@ -112,6 +115,11 @@ export default function Home() {
               <option value={24}>1 day</option>
               <option value={168}>1 week</option>
             </select>
+          </div>
+
+          <div className='mb-6'>
+            <label className='block text-slate-700 dark:text-slate-300 mb-2 text-sm font-medium'>Tags</label>
+            <TagInput tags={tags} onChange={setTags} placeholder='Add tags for your todo list' />
           </div>
 
           <div className='mb-6'>

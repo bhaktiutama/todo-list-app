@@ -17,7 +17,7 @@ const PRIORITY_STYLES: Record<Priority, { bg: string; border: string; text: stri
     bg: 'bg-yellow-400',
     border: 'border-yellow-400',
     text: 'text-black',
-    label: 'Medium',
+    label: 'Med',
   },
   high: {
     bg: 'bg-red-600',

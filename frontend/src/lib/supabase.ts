@@ -43,6 +43,7 @@ export interface Database {
           order: number;
           created_at: string;
           completed_at: string | null;
+          priority: string;
         };
         Insert: {
           id?: string;
@@ -52,6 +53,7 @@ export interface Database {
           order: number;
           created_at?: string;
           completed_at?: string | null;
+          priority?: string;
         };
         Update: {
           id?: string;
@@ -61,6 +63,43 @@ export interface Database {
           order?: number;
           created_at?: string;
           completed_at?: string | null;
+          priority?: string;
+        };
+      };
+      tags: {
+        Row: {
+          id: string;
+          name: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+      };
+      todolist_tags: {
+        Row: {
+          todolist_id: string;
+          tag_id: string;
+          created_at: string;
+        };
+        Insert: {
+          todolist_id: string;
+          tag_id: string;
+          created_at?: string;
+        };
+        Update: {
+          todolist_id?: string;
+          tag_id?: string;
+          created_at?: string;
         };
       };
     };
@@ -68,7 +107,13 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      manage_todolist_tags: {
+        Args: {
+          p_todolist_id: string;
+          p_tag_names: string[];
+        };
+        Returns: void;
+      };
     };
     Enums: {
       [_ in never]: never;

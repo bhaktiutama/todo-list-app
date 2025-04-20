@@ -21,17 +21,45 @@ export class SupabaseTodoApi implements TodoApiService {
 
     // Create initial items if provided
     if (request.items && request.items.length > 0) {
-      const { error: itemsError } = await supabase.from('todo_items').insert(
-        request.items.map((item) => ({
-          todo_list_id: todoList.id,
-          content: item.content,
-          completed: item.completed,
-          order: item.order,
-          priority: item.priority || 'medium', // Add default priority if not provided
-        }))
-      );
+      const { data: insertedItems, error: itemsError } = await supabase
+        .from('todo_items')
+        .insert(
+          request.items.map((item) => ({
+            todo_list_id: todoList.id,
+            content: item.content,
+            completed: item.completed,
+            order: item.order,
+            priority: item.priority || 'medium',
+          }))
+        )
+        .select();
 
       if (itemsError) throw new Error('Failed to create todo items');
+
+      // Add tags if provided
+      if (request.tags && request.tags.length > 0) {
+        const { error: tagError } = await supabase.rpc('manage_todolist_tags', {
+          p_todolist_id: todoList.id,
+          p_tag_names: request.tags.map((tag) => tag.name),
+        });
+
+        if (tagError) {
+          console.error('Tag creation error:', tagError);
+          throw new Error('Failed to add tags to todo list');
+        }
+      }
+
+      return {
+        id: todoList.id,
+        edit_token: todoList.edit_token,
+        todo_list: {
+          id: todoList.id,
+          created_at: todoList.created_at,
+          expires_at: todoList.expires_at,
+          items: insertedItems || [],
+          tags: [], // Tags will be fetched in the next request
+        },
+      };
     }
 
     return {
@@ -41,25 +69,41 @@ export class SupabaseTodoApi implements TodoApiService {
         id: todoList.id,
         created_at: todoList.created_at,
         expires_at: todoList.expires_at,
-        items: request.items || [],
+        items: [],
+        tags: [], // Tags will be fetched in the next request
       },
     };
   }
 
   async getTodoList(id: string): Promise<TodoList> {
-    const { data: todoList, error: todoListError } = await supabase.from('todo_lists').select('*').eq('id', id).single();
+    // Get todo list with its tags
+    const { data: todoList, error: todoListError } = await supabase
+      .from('todo_lists')
+      .select(
+        `
+        *,
+        tags:todolist_tags(
+          tag:tags(*)
+        )
+      `
+      )
+      .eq('id', id)
+      .single();
 
     if (todoListError || !todoList) throw new Error('Failed to get todo list');
 
+    // Get items
     const { data: items, error: itemsError } = await supabase.from('todo_items').select('*').eq('todo_list_id', id).order('order', { ascending: true });
 
     if (itemsError) throw new Error('Failed to get todo items');
 
+    // Transform the todo list to match the expected format
     return {
       id: todoList.id,
       created_at: todoList.created_at,
       expires_at: todoList.expires_at,
       items: items || [],
+      tags: todoList.tags?.map((t: any) => t.tag) || [],
     };
   }
 
@@ -116,7 +160,7 @@ export class SupabaseTodoApi implements TodoApiService {
             completed: item.completed,
             order: item.order,
             completed_at: item.completed ? new Date().toISOString() : null,
-            priority: item.priority || 'medium', // Add priority field with default
+            priority: item.priority || 'medium',
           })
           .eq('id', item.id);
 
@@ -136,7 +180,7 @@ export class SupabaseTodoApi implements TodoApiService {
             content: item.content,
             completed: item.completed,
             order: item.order,
-            priority: item.priority || 'medium', // Add priority field with default
+            priority: item.priority || 'medium',
           }))
         );
 
@@ -144,6 +188,19 @@ export class SupabaseTodoApi implements TodoApiService {
           console.error('Insert error:', error);
           throw new Error('Failed to create items');
         }
+      }
+    }
+
+    // Update tags if provided
+    if (request.tags !== undefined) {
+      const { error: tagError } = await supabase.rpc('manage_todolist_tags', {
+        p_todolist_id: id,
+        p_tag_names: request.tags,
+      });
+
+      if (tagError) {
+        console.error('Tag update error:', tagError);
+        throw new Error('Failed to update tags');
       }
     }
 

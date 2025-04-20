@@ -1,7 +1,15 @@
 import { Priority } from './priority';
 
+export interface Tag {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TodoItem {
   id?: string;
+  todo_list_id?: string;
   content: string;
   completed: boolean;
   order: number;
@@ -16,16 +24,19 @@ export interface TodoList {
   expires_at: string;
   edit_token?: string;
   items: TodoItem[];
+  tags?: Tag[];
 }
 
 export interface CreateTodoListRequest {
   expiration_hours: number;
   edit_token?: string;
   items: Omit<TodoItem, 'id' | 'created_at' | 'completed_at'>[];
+  tags?: { name: string }[];
 }
 
 export interface UpdateTodoListRequest {
-  items: TodoItem[];
+  items?: TodoItem[];
+  tags?: string[]; // Array of tag names
 }
 
 export interface CreateTodoListResponse {

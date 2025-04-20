@@ -25,7 +25,7 @@ export const PRIORITY_CONFIGS: Record<Priority, PriorityConfig> = {
     },
   },
   medium: {
-    label: 'Medium',
+    label: 'Med',
     color: {
       bg: 'from-yellow-50/80 to-yellow-100/80',
       border: 'border-yellow-200',

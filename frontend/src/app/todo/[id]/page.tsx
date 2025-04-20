@@ -54,7 +54,14 @@ export default function TodoPage() {
     setSaveError(null);
 
     try {
-      const request: UpdateTodoListRequest = { items: updatedTodoList.items };
+      // Prepare the request with tag names for the API
+      const request: UpdateTodoListRequest = {
+        items: updatedTodoList.items,
+        tags: updatedTodoList.tags?.map((tag) => tag.name) || [],
+      };
+
+      console.log('Updating todo list with tags:', request.tags);
+
       const updatedList = await todoApi.updateTodoList(id, editToken, request);
       setTodoList(updatedList);
     } catch (err) {

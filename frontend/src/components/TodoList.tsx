@@ -3,6 +3,9 @@ import { TodoItem as TodoItemComponent } from './TodoItem';
 import { TodoItem as TodoItemType, TodoList as TodoListType } from '../types/todo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { todoApi } from '../services/api';
+import { TagInput } from './tag/TagInput';
+import { FilterInput } from './task/FilterInput';
+import { SortDropdown, TaskSort } from './task/SortDropdown';
 
 interface TodoListProps {
   todoList: TodoListType;
@@ -17,10 +20,19 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   const [isSyncing, setIsSyncing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const isWebSocketEnabled = process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET === 'true';
+  const [filterText, setFilterText] = useState('');
+  const [sort, setSort] = useState<TaskSort>('order');
+
+  // Initialize tags from todoList.tags
+  const [tags, setTags] = useState<string[]>(todoList.tags?.map((tag) => tag.name) || []);
 
   // Update local state when initialTodoList changes
   useEffect(() => {
     setTodoList(initialTodoList);
+    // Update tags when todoList changes
+    const incomingTags = initialTodoList.tags?.map((tag) => tag.name) || [];
+    console.log('Received updated todo list with tags:', incomingTags);
+    setTags(incomingTags);
   }, [initialTodoList]);
 
   // Calculate completion stats
@@ -35,6 +47,8 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
       if (!isEditing) {
         // Only update if not actively editing
         setTodoList(updatedTodoList);
+        // Update the tags from incoming todo list
+        setTags(updatedTodoList.tags?.map((tag) => tag.name) || []);
         setIsSyncing(false);
       }
     },
@@ -56,6 +70,8 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
           setIsSyncing(true);
           const data = await todoApi.getTodoList(todoList.id);
           setTodoList(data);
+          // Update tags from fresh data
+          setTags(data.tags?.map((tag) => tag.name) || []);
         }
       } catch (error) {
         console.error('Error polling todo list:', error);
@@ -71,6 +87,28 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
     };
   }, [isWebSocketEnabled, todoList.id, isEditing]);
 
+  // Filter dan sort item
+  let filteredItems = todoList.items;
+  if (filterText.trim()) {
+    filteredItems = filteredItems.filter((item) => item.content.toLowerCase().includes(filterText.toLowerCase()));
+  }
+  if (sort === 'priority') {
+    // Sort by priority: high > medium > low
+    filteredItems = [...filteredItems].sort((a, b) => {
+      const priorityOrder = { high: 1, medium: 2, low: 3 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
+  } else if (sort === 'alphabetical') {
+    filteredItems = [...filteredItems].sort((a, b) => a.content.localeCompare(b.content));
+  } else if (sort === 'created') {
+    filteredItems = [...filteredItems].sort((a, b) => {
+      if (!a.created_at) return 1;
+      if (!b.created_at) return -1;
+      return a.created_at > b.created_at ? 1 : -1;
+    });
+  }
+  // order: default urutan
+
   const handleItemUpdate = async (updatedItem: TodoItemType) => {
     if (!isEditable) return;
 
@@ -85,6 +123,43 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
     setTodoList(updatedTodoList);
     await onUpdate(updatedTodoList);
     setIsEditing(false);
+  };
+
+  // Add a function to handle tag changes
+  const handleTagsChange = async (newTags: string[]) => {
+    if (!isEditable) return;
+
+    setIsEditing(true);
+    setTags(newTags);
+
+    // Create temporary tag objects with the required structure
+    const tagObjects = newTags.map((name) => ({
+      id: '',
+      name,
+      created_at: '',
+      updated_at: '',
+    }));
+
+    const updatedTodoList = {
+      ...todoList,
+      tags: tagObjects,
+    };
+
+    setTodoList(updatedTodoList);
+
+    try {
+      // When sending to the API, just send the tag names
+      await onUpdate({
+        ...updatedTodoList,
+        tags: tagObjects,
+      });
+    } catch (error) {
+      console.error('Error updating tags:', error);
+      // Revert to previous tags on error
+      setTags(todoList.tags?.map((tag) => tag.name) || []);
+    } finally {
+      setIsEditing(false);
+    }
   };
 
   const handleAddItem = async () => {
@@ -137,7 +212,6 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
         <div className='flex justify-between items-center'>
           <div className='flex flex-col'>
             <h2 className='text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent'>Your Tasks</h2>
-            <p className='text-sm text-slate-500 dark:text-slate-400'>{totalItems === 0 ? 'No tasks yet' : `${completedItems} of ${totalItems} completed`}</p>
           </div>
           <div className='flex items-center space-x-3'>
             {(isSaving || isSyncing) && (
@@ -158,29 +232,31 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
           </div>
         </div>
 
-        {/* Progress Bar */}
+        <div className='flex flex-wrap gap-2 items-center'>
+          <FilterInput value={filterText} onChange={setFilterText} />
+          <SortDropdown value={sort} onChange={setSort} />
+          <TagInput tags={tags} onChange={handleTagsChange} />
+        </div>
+
         <div className='relative pt-4'>
           <div className='flex mb-2 items-center justify-between'>
-            <div>
-              <span className='text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 dark:text-blue-400 bg-blue-100/80 dark:bg-blue-900/30'>Task Progress</span>
-            </div>
-            <div className='text-right'>
-              <span className='text-xs font-semibold inline-block text-blue-600 dark:text-blue-400'>{Math.round(completionPercentage)}%</span>
-            </div>
+            <span className='text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 dark:text-blue-400 bg-blue-100/80 dark:bg-blue-900/30'>Task Progress</span>
+            <span className='flex-1 text-center text-xs font-semibold text-blue-600 dark:text-blue-400'>{Math.round(completionPercentage)}%</span>
+            <span className='text-xs font-semibold inline-block text-blue-600 dark:text-blue-400'>
+              {completedItems} of {totalItems} completed
+            </span>
           </div>
           <div className='overflow-hidden h-2 text-xs flex rounded-full bg-blue-50 dark:bg-blue-900/30'>
             <div style={{ width: `${completionPercentage}%` }} className='shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 transition-all duration-500 ease-out'></div>
           </div>
         </div>
 
-        {/* Todo Items */}
         <div className='space-y-2'>
-          {todoList.items.map((item, index) => (
+          {filteredItems.map((item, index) => (
             <TodoItemComponent key={item.id || `temp-${index}`} item={item} index={index} isEditable={isEditable} onUpdate={handleItemUpdate} onDelete={handleDeleteItem} />
           ))}
         </div>
 
-        {/* Add Task Button */}
         {isEditable && (
           <button onClick={handleAddItem} className='w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-200/50 dark:border-blue-700/50 text-blue-600 dark:text-blue-400 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50'>
             <div className='flex items-center justify-center'>
