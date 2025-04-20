@@ -84,7 +84,7 @@ export function TodoItem({ item, index, isEditable, onUpdate, onDelete }: TodoIt
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`group relative flex items-center p-4 bg-white/60 backdrop-blur-sm rounded-xl
-                ${item.completed ? 'bg-gradient-to-r from-green-50/80 to-green-100/80 dark:from-green-900/20 dark:to-green-800/20 border border-green-200 dark:border-green-800' : 'bg-white/60 dark:bg-slate-800/60 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-100/50 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 border border-slate-200 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-700'}
+                ${item.completed ? 'bg-gradient-to-r from-green-50/80 to-green-100/80 dark:from-green-900/60 dark:to-green-800/60 border border-green-200 dark:border-green-900' : 'bg-white/60 dark:bg-slate-800/60 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-100/50 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 border border-slate-200 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-700'}
                 transition-all duration-200 ease-in-out transform`}
     >
       <div className='flex items-center justify-center'>
