@@ -232,10 +232,12 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
           </div>
         </div>
 
-        <div className='flex flex-wrap gap-2 items-center'>
+        <div className='w-full'>
+          <TagInput tags={tags} onChange={handleTagsChange} />
+        </div>
+        <div className='flex flex-wrap gap-2 items-center w-full'>
           <FilterInput value={filterText} onChange={setFilterText} />
           <SortDropdown value={sort} onChange={setSort} />
-          <TagInput tags={tags} onChange={handleTagsChange} />
         </div>
 
         <div className='relative pt-4'>
