@@ -20,6 +20,8 @@ export default function TodoPage() {
   const [viewUrl, setViewUrl] = useState<string>('');
   const [editUrl, setEditUrl] = useState<string>('');
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isPolling, setIsPolling] = useState(false);
 
   useEffect(() => {
     const fetchTodoList = async () => {
@@ -124,7 +126,22 @@ export default function TodoPage() {
               <div className='flex items-center justify-between'>
                 <h1 className='text-2xl font-semibold text-slate-900 dark:text-white'>{isEditable ? 'Edit Todo List' : 'View Todo List'}</h1>
                 <div className='flex items-center gap-2'>
-                  <div className='flex items-center px-3 py-1.5 bg-orange-50/80 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200/50 dark:border-orange-700/50'>
+                  {(isSaving || isSyncing) && (
+                    <div className='flex items-center px-3 py-1.5 bg-blue-50/80 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full border border-blue-200/50 dark:border-blue-700/50 shadow-sm text-xs font-medium outline outline-1 outline-blue-200/50 dark:outline-blue-700/50'>
+                      <svg className='animate-spin h-4 w-4 mr-2' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                        <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                      </svg>
+                      <span>Syncing</span>
+                    </div>
+                  )}
+                  {isPolling && !isSaving && !isSyncing && isEditable && (
+                    <div className='flex items-center px-3 py-1.5 bg-green-50/80 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full border border-green-200/50 dark:border-green-700/50 shadow-sm text-xs font-medium outline outline-1 outline-green-200/50 dark:outline-green-700/50'>
+                      <div className='w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 mr-2 animate-pulse'></div>
+                      <span>Auto-saving</span>
+                    </div>
+                  )}
+                  <div className='flex items-center px-3 py-1.5 bg-orange-50/80 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200/50 dark:border-orange-700/50 shadow-sm text-xs font-medium outline outline-1 outline-orange-200/50 dark:outline-orange-700/50'>
                     <svg xmlns='http://www.w3.org/2000/svg' className='h-3.5 w-3.5 mr-1' viewBox='0 0 20 20' fill='currentColor'>
                       <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z' clipRule='evenodd' />
                     </svg>
@@ -202,7 +219,7 @@ export default function TodoPage() {
 
           {/* Todo List Component */}
           <div className='p-6 pt-0'>
-            <TodoList todoList={todoList} isEditable={isEditable} onUpdate={handleUpdateTodoList} isSaving={isSaving} />
+            <TodoList todoList={todoList} isEditable={isEditable} onUpdate={handleUpdateTodoList} isSaving={isSaving} setIsSyncing={setIsSyncing} setIsPolling={setIsPolling} />
           </div>
         </div>
       </div>

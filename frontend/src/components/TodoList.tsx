@@ -11,17 +11,15 @@ interface TodoListProps {
   isEditable: boolean;
   onUpdate: (todoList: TodoListType) => void;
   isSaving?: boolean;
+  setIsSyncing?: (v: boolean) => void;
+  setIsPolling?: (v: boolean) => void;
 }
 
-export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSaving = false }: TodoListProps) {
+export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSaving = false, setIsSyncing, setIsPolling }: TodoListProps) {
   const [todoList, setTodoList] = useState<TodoListType>(initialTodoList);
-  const [isPolling, setIsPolling] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [filterText, setFilterText] = useState('');
   const [sort, setSort] = useState<TaskSort>('order');
-
-  // Initialize tags from todoList.tags
   const [tags, setTags] = useState<string[]>(todoList.tags?.map((tag) => tag.name) || []);
 
   // Update local state when initialTodoList changes
@@ -40,31 +38,30 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
 
   // Polling for updates
   useEffect(() => {
-    setIsPolling(true);
+    if (setIsPolling) setIsPolling(true);
     console.log('Starting polling');
 
     const pollInterval = setInterval(async () => {
       try {
         if (!isEditing) {
-          setIsSyncing(true);
+          if (setIsSyncing) setIsSyncing(true);
           const data = await todoApi.getTodoList(todoList.id);
           setTodoList(data);
-          // Update tags from fresh data
           setTags(data.tags?.map((tag) => tag.name) || []);
         }
       } catch (error) {
         console.error('Error polling todo list:', error);
       } finally {
-        setIsSyncing(false);
+        if (setIsSyncing) setIsSyncing(false);
       }
     }, 5000);
 
     return () => {
       console.log('Stopping polling');
       clearInterval(pollInterval);
-      setIsPolling(false);
+      if (setIsPolling) setIsPolling(false);
     };
-  }, [todoList.id, isEditing]);
+  }, [todoList.id, isEditing, setIsPolling, setIsSyncing]);
 
   // Filter dan sort item
   let filteredItems = todoList.items;
@@ -188,26 +185,27 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   return (
     <div className='space-y-6 p-6 bg-gradient-to-br from-white/80 to-white/40 dark:from-slate-800/80 dark:to-slate-900/40 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-white/10 shadow-xl'>
       <div className='flex flex-col space-y-4'>
-        <div className='flex justify-between items-center'>
+        <div className='flex justify-between items-center flex-wrap gap-y-2'>
           <div className='flex flex-col'>
             <h2 className='text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent'>Your Tasks</h2>
           </div>
-          <div className='flex items-center space-x-3'>
-            {(isSaving || isSyncing) && (
-              <div className='flex items-center px-3 py-1 bg-blue-50/80 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full'>
-                <svg className='animate-spin h-4 w-4 mr-2' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                  <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
-                  <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
-                </svg>
-                <span className='text-sm font-medium'>Syncing</span>
-              </div>
-            )}
-            {isPolling && !isSaving && !isSyncing && isEditable && (
-              <div className='px-3 py-1 bg-green-50/80 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center'>
-                <div className='w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 mr-2 animate-pulse'></div>
-                <span className='text-sm font-medium'>Auto-saving</span>
-              </div>
-            )}
+          {/* Badge modern untuk views dan likes */}
+          <div className='flex flex-row gap-2 items-center mt-2 sm:mt-0'>
+            {/* Views */}
+            <div className='flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 shadow-sm text-sm font-semibold' title='Views'>
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 mr-1.5' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                <path strokeLinecap='round' strokeLinejoin='round' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
+              </svg>
+              123
+            </div>
+            {/* Likes */}
+            <div className='flex items-center px-3 py-1 rounded-full bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-300 shadow-sm text-sm font-semibold' title='Likes'>
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 mr-1.5' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z' />
+              </svg>
+              45
+            </div>
           </div>
         </div>
 

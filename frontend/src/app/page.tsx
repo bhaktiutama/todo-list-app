@@ -32,6 +32,29 @@ export default function Home() {
     }
   }, [items.length]);
 
+  useEffect(() => {
+    // Reset form jika tombol '+ New List' diklik di halaman ini
+    const handleNewListClick = (e: Event) => {
+      e.preventDefault();
+      setItems([{ content: '', completed: false, order: 0, priority: 'medium' }]);
+      setTags([]);
+      setExpirationHours(24);
+      setError(null);
+      if (firstInputRef.current) {
+        firstInputRef.current.focus();
+      }
+    };
+    const btn = document.getElementById('new-list-btn');
+    if (btn) {
+      btn.addEventListener('click', handleNewListClick);
+    }
+    return () => {
+      if (btn) {
+        btn.removeEventListener('click', handleNewListClick);
+      }
+    };
+  }, []);
+
   const handleAddItem = () => {
     setItems([...items, { content: '', completed: false, order: items.length, priority: 'medium' }]);
   };

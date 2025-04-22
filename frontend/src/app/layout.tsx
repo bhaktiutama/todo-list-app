@@ -2,6 +2,8 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/context/ThemeContext';
 import ThemeToggle from '@/components/ThemeToggle';
+import NewListButton from '@/components/NewListButton';
+import DuplicateListButton from '@/components/DuplicateListButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -12,17 +14,13 @@ const inter = Inter({
 export const metadata = {
   title: 'Todo List App',
   description: 'A shareable todo list application built with Next.js and Go',
-}
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+    <html lang='en' className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
       <head>
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+        <link rel='stylesheet' href='https://rsms.me/inter/inter.css' />
         {/* Inline script to prevent FOUC (Flash of Unstyled Content) */}
         <script
           dangerouslySetInnerHTML={{
@@ -46,14 +44,17 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-gradient-to-br from-slate-50 to-white dark:from-dark-bg dark:to-dark-surface min-h-screen transition-colors duration-200" suppressHydrationWarning>
+      <body className='bg-gradient-to-br from-slate-50 to-white dark:from-dark-bg dark:to-dark-surface min-h-screen transition-colors duration-200' suppressHydrationWarning>
         <ThemeProvider>
-          <div className="relative">
-            <ThemeToggle />
+          <div className='relative'>
+            {/* Tombol New List, Duplicate, dan ThemeToggle di pojok kanan atas, vertikal dan rapi */}
+            <NewListButton className='fixed right-4 top-4 z-50' />
+            <DuplicateListButton className='fixed right-4 top-16 z-50' />
+            <ThemeToggle className='fixed right-4 top-28 z-50' />
             {children}
           </div>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
