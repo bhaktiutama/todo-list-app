@@ -78,9 +78,9 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, placeholder 
         ${tags.length > 0 ? 'border-none bg-transparent' : 'border bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600'}`}
     >
       {tags.map((tag) => (
-        <span key={tag} className='flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium border border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700 h-6'>
+        <span key={tag} className='flex items-center bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium border border-blue-500 dark:bg-blue-600 dark:text-white dark:border-blue-600 h-6'>
           <span className='mr-1'>#{tag}</span>
-          <button type='button' className='ml-1 text-blue-500 hover:text-red-500 focus:outline-none dark:text-blue-300 dark:hover:text-red-400' onClick={() => handleRemoveTag(tag)} aria-label={`Remove tag ${tag}`}>
+          <button type='button' className='ml-1 text-white hover:text-red-200 focus:outline-none dark:text-white dark:hover:text-red-300' onClick={() => handleRemoveTag(tag)} aria-label={`Remove tag ${tag}`}>
             ×
           </button>
         </span>
@@ -99,7 +99,7 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, placeholder 
           <input
             ref={inputRef}
             type='text'
-            className='bg-transparent outline-none border-none text-sm text-black dark:text-white placeholder-slate-400 dark:placeholder-slate-500 h-8 min-w-[80px] px-2 pl-8'
+            className='bg-transparent outline-none border-none text-sm text-black dark:text-white placeholder-slate-400 dark:placeholder-slate-500 h-9 min-w-[80px] px-2 pl-8'
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
