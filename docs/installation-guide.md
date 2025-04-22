@@ -1,411 +1,167 @@
 # Panduan Instalasi Todo List Pastebin
 
-Dokumen ini berisi instruksi langkah demi langkah untuk menginstal dan menjalankan aplikasi Todo List Pastebin, baik untuk pengembangan maupun untuk produksi.
+Panduan ini akan membantu Anda menginstal dan menjalankan Todo List Pastebin di lingkungan lokal.
 
 ## Prasyarat
 
-1. **Go** - versi 1.21 atau lebih tinggi (untuk backend Go)
+Sebelum memulai, pastikan Anda memiliki:
 
-   - Download: [https://golang.org/dl/](https://golang.org/dl/)
-   - Verifikasi instalasi: `go version`
+- Node.js versi 18 atau lebih tinggi
+- NPM atau Yarn
+- Git
+- Akun Supabase (gratis)
+- Editor kode (disarankan: VS Code)
 
-2. **Node.js** - versi 18 atau lebih tinggi
+## Setup Supabase
 
-   - Download: [https://nodejs.org/](https://nodejs.org/)
-   - Verifikasi instalasi: `node -v`
-
-3. **Redis** - untuk penyimpanan data (untuk backend Go)
-
-   - Linux: `sudo apt-get install redis-server`
-   - macOS: `brew install redis`
-   - Windows: Gunakan Redis Windows atau WSL
-   - Verifikasi instalasi: `redis-cli ping` (harus mengembalikan "PONG")
-
-4. **Supabase Account** (opsional - jika menggunakan backend Supabase)
-
-   - Daftar di [https://supabase.com/](https://supabase.com/)
-   - Buat proyek baru
-
-5. **Git** - untuk clone repository
-   - Download: [https://git-scm.com/downloads](https://git-scm.com/downloads)
-   - Verifikasi instalasi: `git --version`
-
-## Setup untuk Pengembangan
-
-### Konfigurasi Backend (Go) - Opsional
-
-1. **Clone repository**
-
-   ```bash
-   git clone https://github.com/yourusername/todo-list-app.git
-   cd todo-list-app
-   ```
-
-2. **Persiapkan backend**
-
-   ```bash
-   cd backend
-   ```
-
-3. **Instal dependensi Go**
-
-   ```bash
-   go mod download
-   go mod tidy
-   ```
-
-4. **Setup konfigurasi lingkungan**
-
-   Buat file `.env` di folder `backend`:
-
-   ```
-   REDIS_URL=localhost:6379
-   REDIS_PASSWORD=
-   PORT=8080
-   CORS_ORIGIN=http://localhost:3000
-   WEBSOCKET_ENABLED=true
-   ```
-
-5. **Jalankan backend**
-
-   ```bash
-   go run main.go
-   ```
-
-   Server akan berjalan di http://localhost:8080
-
-### Konfigurasi Supabase Backend - Opsional
-
-1. **Buat proyek Supabase baru**
-
-   - Buka [https://app.supabase.com/](https://app.supabase.com/)
-   - Klik "New Project"
-   - Isi detail proyek dan create
-
-2. **Buat tabel yang diperlukan**
-
+1. Buat akun Supabase di [supabase.com](https://supabase.com)
+2. Buat project baru
+3. Catat URL dan anon key dari project
+4. Jalankan migrasi database:
    - Buka SQL Editor di dashboard Supabase
-   - Jalankan SQL berikut:
+   - Copy dan paste semua file migrasi dari folder `supabase/migrations`
+   - Jalankan migrasi secara berurutan
 
-   ```sql
-   -- Buat tabel todo_lists
-   CREATE TABLE public.todo_lists (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     user_id UUID REFERENCES auth.users(id),
-     edit_token TEXT NOT NULL,
-     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-     expires_at TIMESTAMP WITH TIME ZONE NOT NULL
-   );
+## Setup Frontend
 
-   -- Buat tabel todo_items
-   CREATE TABLE public.todo_items (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     todo_list_id UUID REFERENCES public.todo_lists(id) ON DELETE CASCADE NOT NULL,
-     content TEXT NOT NULL,
-     completed BOOLEAN DEFAULT false,
-     order INTEGER DEFAULT 0,
-     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-     completed_at TIMESTAMP WITH TIME ZONE
-   );
-
-   -- Buat index untuk meningkatkan performa query
-   CREATE INDEX idx_todo_items_todo_list_id ON public.todo_items(todo_list_id);
-   CREATE INDEX idx_todo_lists_user_id ON public.todo_lists(user_id);
-   CREATE INDEX idx_todo_lists_expires_at ON public.todo_lists(expires_at);
-   ```
-
-3. **Setup Row Level Security (RLS)**
-
-   - Aktifkan RLS pada kedua tabel:
-
-   ```sql
-   -- Aktifkan RLS
-   ALTER TABLE public.todo_lists ENABLE ROW LEVEL SECURITY;
-   ALTER TABLE public.todo_items ENABLE ROW LEVEL SECURITY;
-
-   -- Buat kebijakan untuk todo_lists
-   CREATE POLICY "Pengguna dapat melihat todo_lists mereka sendiri" ON public.todo_lists
-   FOR SELECT USING (auth.uid() = user_id);
-
-   CREATE POLICY "Pengguna dapat membuat todo_lists" ON public.todo_lists
-   FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-   CREATE POLICY "Pengguna dapat mengupdate todo_lists mereka sendiri" ON public.todo_lists
-   FOR UPDATE USING (auth.uid() = user_id);
-
-   CREATE POLICY "Pengguna dapat menghapus todo_lists mereka sendiri" ON public.todo_lists
-   FOR DELETE USING (auth.uid() = user_id);
-
-   -- Buat kebijakan untuk todo_items
-   CREATE POLICY "Pengguna dapat melihat todo_items dari todo_lists mereka" ON public.todo_items
-   FOR SELECT USING (
-     EXISTS (
-       SELECT 1 FROM public.todo_lists
-       WHERE todo_lists.id = todo_items.todo_list_id
-       AND todo_lists.user_id = auth.uid()
-     )
-   );
-
-   CREATE POLICY "Pengguna dapat membuat todo_items dalam todo_lists mereka" ON public.todo_items
-   FOR INSERT WITH CHECK (
-     EXISTS (
-       SELECT 1 FROM public.todo_lists
-       WHERE todo_lists.id = todo_items.todo_list_id
-       AND todo_lists.user_id = auth.uid()
-     )
-   );
-
-   CREATE POLICY "Pengguna dapat mengupdate todo_items dalam todo_lists mereka" ON public.todo_items
-   FOR UPDATE USING (
-     EXISTS (
-       SELECT 1 FROM public.todo_lists
-       WHERE todo_lists.id = todo_items.todo_list_id
-       AND todo_lists.user_id = auth.uid()
-     )
-   );
-
-   CREATE POLICY "Pengguna dapat menghapus todo_items dalam todo_lists mereka" ON public.todo_items
-   FOR DELETE USING (
-     EXISTS (
-       SELECT 1 FROM public.todo_lists
-       WHERE todo_lists.id = todo_items.todo_list_id
-       AND todo_lists.user_id = auth.uid()
-     )
-   );
-   ```
-
-4. **Dapatkan API keys**
-   - Di dashboard Supabase, buka "Project Settings" > "API"
-   - Catat URL dan anon key untuk konfigurasi frontend
-
-### Konfigurasi Frontend (Next.js)
-
-1. **Masuk ke direktori frontend**
-
-   ```bash
-   cd ../frontend
-   ```
-
-2. **Instal dependensi Node.js**
-
-   ```bash
-   npm install
-   # atau jika menggunakan yarn
-   yarn install
-   ```
-
-3. **Setup konfigurasi lingkungan**
-
-   Buat file `.env.local` di folder `frontend`:
-
-   ```
-   # Untuk menggunakan backend Go
-   NEXT_PUBLIC_API_URL=http://localhost:8080
-   NEXT_PUBLIC_BACKEND_PROVIDER=go
-   NEXT_PUBLIC_ENABLE_WEBSOCKET=true
-
-   # Untuk menggunakan backend Supabase
-   # NEXT_PUBLIC_BACKEND_PROVIDER=supabase
-   # NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-url.supabase.co
-   # NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
-
-   Untuk menggunakan Supabase, uncomment (hapus #) pada 3 baris terakhir dan isi dengan URL dan anon key dari proyek Supabase Anda.
-
-4. **Jalankan server pengembangan**
-
-   ```bash
-   npm run dev
-   # atau jika menggunakan yarn
-   yarn dev
-   ```
-
-   Aplikasi akan berjalan di http://localhost:3000
-
-## Troubleshooting Umum
-
-### Redis Connection Failed
-
-Jika mendapatkan error koneksi Redis:
-
-1. Periksa status Redis:
-
-   ```bash
-   # macOS/Linux
-   systemctl status redis
-   # atau
-   redis-cli ping
-   ```
-
-2. Tinjau log Redis:
-
-   ```bash
-   # macOS/Linux
-   tail -f /var/log/redis/redis-server.log
-   ```
-
-3. Coba ganti URL Redis di file `.env` dengan IP eksplisit:
-   ```
-   REDIS_URL=127.0.0.1:6379
-   ```
-
-### Temporary ID Error
-
-Jika mengalami error saat menambahkan task baru:
-
-```
-invalid input syntax for type uuid: "temp-1234567890"
-```
-
-Aplikasi sekarang menangani ID sementara dengan lebih baik menggunakan format `temp-{index}` untuk item yang belum memiliki ID permanen. Jika Anda masih mengalami masalah ini:
-
-1. Pastikan Anda menggunakan versi terbaru aplikasi
-2. Periksa bahwa `NEXT_PUBLIC_BACKEND_PROVIDER` di `.env` sesuai dengan backend yang Anda gunakan (`go` atau `supabase`)
-3. Jika menggunakan Supabase, pastikan tabel `todo_items` mengizinkan UUID null atau memiliki nilai default
-
-### CORS Errors
-
-Jika mendapatkan CORS errors di browser:
-
-1. Pastikan `CORS_ORIGIN` di `.env` backend sesuai dengan URL frontend:
-
-   ```
-   CORS_ORIGIN=http://localhost:3000
-   ```
-
-2. Untuk development, Anda bisa mengaktifkan wildcard origins:
-   ```
-   CORS_ORIGIN=*
-   ```
-
-### WebSocket Tidak Tersambung
-
-Jika WebSocket tidak tersambung:
-
-1. Periksa browser console untuk pesan error
-2. Pastikan `NEXT_PUBLIC_ENABLE_WEBSOCKET=true` di frontend dan `WEBSOCKET_ENABLED=true` di backend
-3. Periksa firewall atau proxy yang mungkin memblokir koneksi WebSocket
-
-## Setup untuk Produksi
-
-### Backend (Go)
-
-1. **Build binary**
-
-   ```bash
-   cd backend
-   go build -o main .
-   ```
-
-2. **Deploy binary dan file .env ke server**
-
-3. **Konfigurasi produksi**
-
-   Edit `.env` untuk produksi:
-
-   ```
-   REDIS_URL=your-redis-server:6379
-   REDIS_PASSWORD=your-redis-password
-   PORT=8080
-   CORS_ORIGIN=https://your-frontend-domain.com
-   WEBSOCKET_ENABLED=true
-   ```
-
-4. **Jalankan dengan process manager (contoh dengan PM2)**
-   ```bash
-   pm2 start ./main --name todo-backend
-   ```
-
-### Supabase Produksi
-
-Untuk deployment produksi dengan Supabase:
-
-1. **Pertimbangkan untuk mengaktifkan fitur backup data**
-2. **Setup Supabase Edge Functions jika diperlukan untuk logika server**
-3. **Catat URL produksi dan anon key untuk konfigurasi frontend**
-
-### Frontend (Next.js)
-
-1. **Build frontend**
-
-   ```bash
-   cd frontend
-   npm run build
-   # atau
-   yarn build
-   ```
-
-2. **Konfigurasi produksi**
-
-   Edit `.env.production` untuk produksi:
-
-   ```
-   # Untuk backend Go
-   NEXT_PUBLIC_API_URL=https://api.your-domain.com
-   NEXT_PUBLIC_BACKEND_PROVIDER=go
-   NEXT_PUBLIC_ENABLE_WEBSOCKET=true
-
-   # Untuk backend Supabase
-   # NEXT_PUBLIC_BACKEND_PROVIDER=supabase
-   # NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-url.supabase.co
-   # NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
-
-3. **Deploy ke platform hosting**
-   - Vercel: `vercel --prod`
-   - Netlify: `netlify deploy --prod`
-   - Atau deploy folder `out` ke server web Anda
-
-## Pemeliharaan
-
-### Backup Data Redis
+1. Clone repository:
 
 ```bash
-# Membuat backup
-redis-cli SAVE
-# atau
-redis-cli BGSAVE
-
-# Lokasi file dump.rdb biasanya:
-# - Linux: /var/lib/redis/dump.rdb
-# - macOS (Homebrew): /usr/local/var/db/redis/dump.rdb
+git clone https://github.com/username/todo-list-app.git
+cd todo-list-app
 ```
 
-### Monitoring
+2. Install dependencies frontend:
 
-1. **Redis monitoring**
+```bash
+cd frontend
+npm install
+```
 
-   ```bash
-   redis-cli monitor
-   ```
+3. Setup environment variables:
+   - Copy `.env.local.example` ke `.env.local`
+   - Update nilai variabel dengan credentials Supabase Anda:
 
-2. **Backend logs**
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
 
-   Jika menggunakan PM2:
+4. Jalankan development server:
 
-   ```bash
-   pm2 logs todo-backend
-   ```
+```bash
+npm run dev
+```
+
+5. Buka http://localhost:3000 di browser
+
+## Struktur Proyek
+
+```
+todo-list-app/
+├── frontend/               # Kode frontend Next.js
+│   ├── public/            # Aset statis
+│   │   ├── app/          # Komponen Next.js App Router
+│   │   ├── components/   # Komponen React reusable
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── lib/          # Library dan utilities
+│   │   ├── services/     # Layanan API Supabase
+│   │   └── types/        # Type definitions
+│   └── package.json      # Dependensi frontend
+└── supabase/             # Konfigurasi Supabase
+    └── migrations/       # File migrasi SQL
+```
+
+## Troubleshooting
+
+### Masalah Umum
+
+1. **Error "Failed to load data"**
+
+   - Periksa credentials Supabase di `.env.local`
+   - Pastikan project Supabase aktif
+   - Periksa console browser untuk error detail
+
+2. **Migrasi database gagal**
+
+   - Jalankan migrasi secara berurutan
+   - Pastikan tidak ada error syntax SQL
+   - Reset database jika diperlukan dan coba lagi
+
+3. **Type errors TypeScript**
+   - Jalankan `npm run build` untuk mengecek type errors
+   - Update types jika ada perubahan schema database
+
+### Debug Mode
+
+Untuk mengaktifkan debug mode:
+
+1. Tambahkan di browser console:
+
+```javascript
+localStorage.setItem('debug', '*');
+```
+
+2. Refresh halaman untuk melihat log detail
+
+## Deployment
+
+### Deploy ke Vercel
+
+1. Push kode ke GitHub
+2. Import project di Vercel
+3. Set environment variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Deploy
+
+### Deploy ke Platform Lain
+
+1. Build frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+2. Set environment variables yang diperlukan
+3. Deploy folder `frontend/.next`
 
 ## Keamanan
 
-1. **Selalu gunakan HTTPS di produksi**
-2. **Pasang rate-limiting untuk API**
-3. **Tetapkan masa kedaluwarsa Redis yang wajar untuk mencegah pertumbuhan database**
-4. **Pertimbangkan untuk menambahkan CAPTCHA untuk pembuatan daftar tugas jika menghadapi spam**
+- Jangan commit file `.env.local`
+- Gunakan Row Level Security Supabase
+- Batasi akses API dengan policy
+- Monitor penggunaan di dashboard Supabase
 
-## Panduan Upgrade
+## Pemeliharaan
 
-### Backend
+### Update Dependencies
 
-1. Pull perubahan terbaru: `git pull`
-2. Update dependensi: `go mod tidy`
-3. Build binary baru: `go build -o main .`
-4. Restart service: `pm2 restart todo-backend`
+```bash
+cd frontend
+npm update
+npm audit fix
+```
 
-### Frontend
+### Backup Database
 
-1. Pull perubahan terbaru: `git pull`
-2. Update dependensi: `npm install` atau `yarn install`
-3. Build ulang: `npm run build` atau `yarn build`
-4. Deploy ulang ke platform hosting
+- Gunakan fitur backup otomatis Supabase
+- Export data manual secara berkala
+- Simpan backup di lokasi aman
+
+## Support
+
+Jika Anda mengalami masalah:
+
+1. Cek [issues di GitHub](https://github.com/username/todo-list-app/issues)
+2. Buat issue baru dengan detail:
+   - Versi Node.js
+   - Output error
+   - Langkah-langkah reproduksi
+   - Screenshot jika relevan
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah MIT License. Lihat file LICENSE untuk detail.

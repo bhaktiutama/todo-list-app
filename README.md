@@ -1,6 +1,6 @@
 # Todo List Pastebin
 
-Aplikasi Todo List yang dapat dibagikan, dibangun dengan Go/Supabase dan Next.js, terinspirasi oleh Pastebin. Aplikasi ini memungkinkan pengguna untuk membuat, mengedit, dan berbagi daftar tugas tanpa perlu login. Dihasilkan dengan vibe coding menggunakan Cursor.ai.
+Aplikasi Todo List yang dapat dibagikan, dibangun dengan Next.js dan Supabase. Aplikasi ini memungkinkan pengguna untuk membuat, mengedit, dan berbagi daftar tugas tanpa perlu login. Dihasilkan dengan vibe coding menggunakan Cursor.ai.
 
 🚀 **Demo**: [https://todo-list-pastebin.vercel.app/](https://todo-list-pastebin.vercel.app/)
 
@@ -10,22 +10,20 @@ Aplikasi Todo List yang dapat dibagikan, dibangun dengan Go/Supabase dan Next.js
 
 - **Pembuatan Daftar Tugas**: Buat daftar tugas tanpa perlu mendaftar atau login
 - **Berbagi Daftar**: Bagikan daftar tugas via URL unik yang dihasilkan setelah pembuatan
-- **Kolaborasi Real-time**: Bekerja sama dengan anggota tim secara real-time melalui WebSocket
+- **Auto-sync**: Sinkronisasi otomatis untuk perubahan data
 - **Daftar Otomatis Kedaluwarsa**: Daftar tugas akan otomatis terhapus setelah periode waktu tertentu
 - **Antarmuka Drag-and-drop**: Susun ulang tugas dengan mudah menggunakan interaksi drag-and-drop
 - **UI Modern**: Tampilan modern dan responsif dengan Tailwind CSS
 - **No Login Required**: Akses dan edit daftar tugas menggunakan token yang dibagikan
-- **Multi-backend Support**: Dukungan untuk backend Go dengan Redis atau Supabase dengan PostgreSQL
+- **Supabase Backend**: Menggunakan Supabase sebagai backend dengan PostgreSQL
 
 ## Tech Stack
 
 ### Backend
 
-- **Go 1.21** (Opsional): Bahasa pemrograman backend dengan Redis
-- **Fiber**: Framework web yang cepat dan ringan
-- **Redis**: Database untuk penyimpanan daftar tugas
-- **WebSocket**: Untuk pembaruan real-time
-- **Supabase** (Opsional): Backend-as-a-Service dengan PostgreSQL dan autentikasi
+- **Supabase**: Backend-as-a-Service dengan PostgreSQL dan autentikasi
+- **PostgreSQL**: Database untuk penyimpanan data
+- **Row Level Security**: Keamanan tingkat baris untuk kontrol akses
 
 ### Frontend
 
@@ -33,18 +31,12 @@ Aplikasi Todo List yang dapat dibagikan, dibangun dengan Go/Supabase dan Next.js
 - **TypeScript**: Bahasa pemrograman yang diketik statis
 - **TailwindCSS**: Framework CSS yang utility-first
 - **React DnD**: Library untuk drag-and-drop
-- **Axios**: Untuk API request
+- **@supabase/supabase-js**: SDK Supabase untuk JavaScript
 
 ## Struktur Proyek
 
 ```
 todo-list-app/
-├── backend/                # Kode backend Go (opsional)
-│   ├── api/                # Handler API dan middleware
-│   ├── config/             # Konfigurasi aplikasi
-│   ├── models/             # Model data
-│   ├── websocket/          # Implementasi WebSocket
-│   └── main.go             # Entry point aplikasi
 ├── frontend/               # Kode frontend Next.js
 │   ├── public/             # Aset statis
 │   ├── src/
@@ -52,7 +44,7 @@ todo-list-app/
 │   │   ├── components/     # Komponen React reusable
 │   │   ├── hooks/          # Custom React hooks
 │   │   ├── lib/            # Library dan utilities
-│   │   ├── services/       # Layanan API (Go dan Supabase)
+│   │   ├── services/       # Layanan API Supabase
 │   │   └── types/          # Type definitions TypeScript
 │   ├── .env.local.example  # Template konfigurasi lingkungan
 │   └── package.json        # Dependensi frontend
@@ -67,29 +59,12 @@ todo-list-app/
 
 ## Perubahan Terbaru
 
-**Versi 1.1.0**
+**Versi 2.0.0**
 
-- Integrasi dengan Supabase sebagai backend alternatif
-- Factory pattern untuk memilih provider backend
-- Perbaikan bug pada penanganan item baru dengan ID temporary
+- Migrasi penuh ke Supabase sebagai satu-satunya backend
+- Penyederhanaan arsitektur aplikasi
+- Peningkatan performa sinkronisasi data
 - Lihat [CHANGELOG.md](docs/CHANGELOG.md) untuk rincian lengkap
-
-## Pemilihan Backend
-
-Aplikasi ini mendukung dua backend:
-
-1. **Go Backend (Default)** - Backend asli berbasis Go dengan Redis
-2. **Supabase Backend** - Backend alternatif menggunakan Supabase dengan PostgreSQL
-
-Untuk mengubah backend yang digunakan, set environment variable `NEXT_PUBLIC_BACKEND_PROVIDER`:
-
-```
-# Untuk Go Backend (default)
-NEXT_PUBLIC_BACKEND_PROVIDER=go
-
-# Untuk Supabase Backend
-NEXT_PUBLIC_BACKEND_PROVIDER=supabase
-```
 
 ## Instalasi dan Setup
 
@@ -97,22 +72,20 @@ Lihat [docs/installation-guide.md](docs/installation-guide.md) untuk instruksi d
 
 ### Prasyarat
 
-- Go 1.21 atau lebih tinggi (jika menggunakan backend Go)
 - Node.js 18 atau lebih tinggi
 - NPM atau Yarn
-- Redis (jika menggunakan backend Go)
-- Akun Supabase (jika menggunakan backend Supabase)
+- Akun Supabase
 
 ### Panduan Cepat
 
 1. Clone repository
-2. Setup backend (Go atau Supabase)
+2. Setup Supabase project dan dapatkan credentials
 3. Setup frontend:
 
 ```bash
 cd frontend
 npm install
-   # Konfigurasi .env.local
+# Konfigurasi .env.local dengan Supabase credentials
 npm run dev
 ```
 

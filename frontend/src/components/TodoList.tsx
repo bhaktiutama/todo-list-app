@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TodoItem as TodoItemComponent } from './TodoItem';
 import { TodoItem as TodoItemType, TodoList as TodoListType } from '../types/todo';
-import { useWebSocket } from '../hooks/useWebSocket';
 import { todoApi } from '../services/api';
 import { TagInput } from './tag/TagInput';
 import { FilterInput } from './task/FilterInput';
@@ -19,7 +18,6 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   const [isPolling, setIsPolling] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const isWebSocketEnabled = process.env.NEXT_PUBLIC_ENABLE_WEBSOCKET === 'true';
   const [filterText, setFilterText] = useState('');
   const [sort, setSort] = useState<TaskSort>('order');
 
@@ -40,27 +38,8 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   const completedItems = todoList.items.filter((item) => item.completed).length;
   const completionPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
-  // Setup WebSocket or polling based on configuration
-  const { isConnected } = useWebSocket({
-    todoId: todoList.id,
-    onUpdate: (updatedTodoList) => {
-      if (!isEditing) {
-        // Only update if not actively editing
-        setTodoList(updatedTodoList);
-        // Update the tags from incoming todo list
-        setTags(updatedTodoList.tags?.map((tag) => tag.name) || []);
-        setIsSyncing(false);
-      }
-    },
-  });
-
-  // Polling when WebSocket is disabled
+  // Polling for updates
   useEffect(() => {
-    if (isWebSocketEnabled) {
-      setIsPolling(false);
-      return;
-    }
-
     setIsPolling(true);
     console.log('Starting polling');
 
@@ -85,7 +64,7 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
       clearInterval(pollInterval);
       setIsPolling(false);
     };
-  }, [isWebSocketEnabled, todoList.id, isEditing]);
+  }, [todoList.id, isEditing]);
 
   // Filter dan sort item
   let filteredItems = todoList.items;

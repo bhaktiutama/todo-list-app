@@ -4,6 +4,22 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 ## [Unreleased]
 
+## [2.0.0] - 2024-03-17
+
+### Changed
+
+- Migrasi penuh ke Supabase sebagai satu-satunya backend
+- Penghapusan backend Golang dan WebSocket
+- Penyederhanaan arsitektur aplikasi dengan menghapus multi-backend support
+- Peningkatan performa sinkronisasi data menggunakan polling
+
+### Removed
+
+- Backend Golang dan semua komponennya
+- Implementasi WebSocket untuk real-time updates
+- Environment variables terkait Golang dan WebSocket
+- Factory pattern untuk pemilihan backend
+
 ## [1.2.0] - 2024-03-19
 
 ### Added
@@ -27,25 +43,24 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 - Membatasi jumlah tag maksimum menjadi 4 per todo list untuk menjaga performa dan keterbacaan
 - Memperpendek label prioritas "Medium" menjadi "Med" agar tampilan lebih ringkas
 
-## [1.1.0] - 2023-08-20
+## [1.1.0] - 2024-03-16
 
 ### Added
 
-- Integrasi dengan Supabase sebagai alternatif backend
-- Dukungan multi-user pada daftar tugas
-- Sistem factory pattern untuk mendukung beberapa backend API
-
-### Fixed
-
-- Memperbaiki masalah menambah item baru dengan ID temporary
-- Memperbaiki error ketika mencentang item dalam daftar tugas
-- Memperbaiki handling ID item yang undefined
-- Memperbaiki urutan pengurutan berdasarkan prioritas agar diurutkan dari high, medium, baru low
+- Sistem prioritas untuk task
+- Komponen PriorityIndicator dan PrioritySelector
+- Integrasi prioritas pada halaman create dan edit
+- Migrasi database untuk kolom priority
 
 ### Changed
 
-- Restrukturisasi API service dengan pendekatan yang lebih modular
-- Memperbarui komponen TodoList untuk menggunakan API abstraksi
+- Perbaikan tampilan PrioritySelector
+- Peningkatan UX dengan indikator prioritas yang lebih jelas
+
+### Fixed
+
+- Penanganan undefined item ID
+- Bug pada tampilan dark mode
 
 ## [1.0.0] - 2023-07-15
 

@@ -86,19 +86,30 @@ export const TagInput: React.FC<TagInputProps> = ({ tags, onChange, placeholder 
         </span>
       ))}
       {tags.length < MAX_TAGS ? (
-        <input
-          ref={inputRef}
-          type='text'
-          className='flex-grow-0 bg-transparent outline-none border-none text-sm text-black dark:text-white placeholder-slate-400 dark:placeholder-slate-500 h-8 min-w-[80px] px-2'
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleInputKeyDown}
-          placeholder={tags.length === 0 ? placeholder || 'Add tag' : ''}
-          style={{
-            lineHeight: '1.5rem',
-            width: `${inputWidth}px`,
-          }}
-        />
+        <div className='relative flex-grow-0'>
+          {tags.length === 0 && !input && (
+            <span className='absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none'>
+              {/* fa-tag icon */}
+              <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4' fill='none' viewBox='0 0 20 20' stroke='currentColor' strokeWidth={2}>
+                <path d='M17.707 10.293l-7-7A1 1 0 009.586 3H4a1 1 0 00-1 1v5.586a1 1 0 00.293.707l7 7a1 1 0 001.414 0l6-6a1 1 0 000-1.414z' />
+                <circle cx='6.5' cy='6.5' r='1.5' />
+              </svg>
+            </span>
+          )}
+          <input
+            ref={inputRef}
+            type='text'
+            className='bg-transparent outline-none border-none text-sm text-black dark:text-white placeholder-slate-400 dark:placeholder-slate-500 h-8 min-w-[80px] px-2 pl-8'
+            value={input}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            placeholder={tags.length === 0 ? placeholder || 'Add tag' : ''}
+            style={{
+              lineHeight: '1.5rem',
+              width: `${inputWidth}px`,
+            }}
+          />
+        </div>
       ) : (
         <span className='text-xs text-orange-500 dark:text-orange-400'>Max 4 tags</span>
       )}
