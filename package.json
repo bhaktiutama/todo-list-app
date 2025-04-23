@@ -3,6 +3,7 @@
     "@tailwindcss/postcss": "^4.0.14"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@supabase/supabase-js": "^2.49.4"
   }
 }

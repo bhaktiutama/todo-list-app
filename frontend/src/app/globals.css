@@ -46,7 +46,7 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
-  
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -83,8 +83,7 @@
 @layer utilities {
   .bg-grid-slate-100 {
     @apply dark:opacity-[0.05];
-    background-image: linear-gradient(to right, rgb(241 245 249 / 0.1) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgb(241 245 249 / 0.1) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgb(241 245 249 / 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgb(241 245 249 / 0.1) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
@@ -121,4 +120,19 @@
   html {
     font-family: 'Inter var', system-ui, sans-serif;
   }
-} 
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}

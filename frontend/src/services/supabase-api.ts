@@ -207,4 +207,26 @@ export class SupabaseTodoApi implements TodoApiService {
     // Return updated todo list
     return this.getTodoList(id);
   }
+
+  async duplicateTodoList(id: string): Promise<CreateTodoListResponse> {
+    // Get original todolist first to copy its data
+    const originalList = await this.getTodoList(id);
+
+    // Create new todolist with same expiration duration
+    const expiresAt = new Date(originalList.expires_at);
+    const now = new Date();
+    const expirationHours = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60));
+
+    // Create new todolist with copied items (all uncompleted) and tags
+    return this.createTodoList({
+      expiration_hours: Math.max(1, expirationHours), // Minimum 1 hour
+      items: originalList.items.map((item) => ({
+        content: item.content,
+        completed: false, // Set all items as uncompleted
+        order: item.order,
+        priority: item.priority,
+      })),
+      tags: originalList.tags,
+    });
+  }
 }
