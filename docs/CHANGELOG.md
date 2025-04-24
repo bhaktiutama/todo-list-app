@@ -4,6 +4,29 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 ## [Unreleased]
 
+### Added
+
+- Fitur drag and drop untuk pengurutan item todo
+- Animasi fade-in-up untuk notifikasi
+- Tombol dan fungsi duplikasi todo list dengan expiry 24 jam
+- Menambahkan navbar dengan navigasi ke halaman About dan Privacy Policy
+- Menambahkan halaman About dengan informasi tentang aplikasi dan pengembang
+- Menambahkan halaman Privacy Policy dengan kebijakan privasi pengguna
+- Menambahkan tautan GitHub repository pada navbar
+
+### Changed
+
+- Memperbarui tampilan progress task dengan format yang lebih ringkas
+- Menambahkan ikon pada input URL untuk meningkatkan visual feedback
+- Menambahkan logo aplikasi pada navbar dengan dukungan tema terang dan gelap
+- Mengimplementasikan logo yang berbeda untuk mode terang (`logo.png`) dan gelap (`logo-dark.png`)
+- Meningkatkan layout aplikasi dengan menambahkan fixed navbar dan proper spacing
+- Memperbaiki responsivitas navbar untuk berbagai ukuran layar
+
+### Removed
+
+- Menghapus indikator pill auto-saving untuk antarmuka yang lebih bersih
+
 ## [2.0.0] - 2024-03-17
 
 ### Changed
