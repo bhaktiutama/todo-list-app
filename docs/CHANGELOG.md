@@ -4,6 +4,8 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 ## [Unreleased]
 
+## [2.0.0] - 2024-03-20
+
 ### Added
 
 - Fitur drag and drop untuk pengurutan item todo
@@ -22,15 +24,6 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 - Mengimplementasikan logo yang berbeda untuk mode terang (`logo.png`) dan gelap (`logo-dark.png`)
 - Meningkatkan layout aplikasi dengan menambahkan fixed navbar dan proper spacing
 - Memperbaiki responsivitas navbar untuk berbagai ukuran layar
-
-### Removed
-
-- Menghapus indikator pill auto-saving untuk antarmuka yang lebih bersih
-
-## [2.0.0] - 2024-03-17
-
-### Changed
-
 - Migrasi penuh ke Supabase sebagai satu-satunya backend
 - Penghapusan backend Golang dan WebSocket
 - Penyederhanaan arsitektur aplikasi dengan menghapus multi-backend support
@@ -38,6 +31,7 @@ Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
 ### Removed
 
+- Menghapus indikator pill auto-saving untuk antarmuka yang lebih bersih
 - Backend Golang dan semua komponennya
 - Implementasi WebSocket untuk real-time updates
 - Environment variables terkait Golang dan WebSocket
