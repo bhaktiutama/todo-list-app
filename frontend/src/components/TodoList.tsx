@@ -247,9 +247,9 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
               <div className='relative pt-4'>
                 <div className='flex mb-2 items-center justify-between'>
                   <span className='text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 dark:text-blue-400 bg-blue-100/80 dark:bg-blue-900/30'>Task Progress</span>
-                  <span className='flex-1 text-center text-xs font-semibold text-blue-600 dark:text-blue-400'>{Math.round(completionPercentage)}%</span>
+                  <span className='flex-1 text-center text-xs font-semibold text-blue-600 dark:text-blue-400'></span>
                   <span className='text-xs font-semibold inline-block text-blue-600 dark:text-blue-400'>
-                    {completedItems} of {totalItems} completed
+                    {completedItems} of {totalItems} completed ({Math.round(completionPercentage)}%)
                   </span>
                 </div>
                 <div className='overflow-hidden h-2 text-xs flex rounded-full bg-blue-50 dark:bg-blue-900/30'>

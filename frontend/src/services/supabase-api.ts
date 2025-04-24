@@ -212,14 +212,9 @@ export class SupabaseTodoApi implements TodoApiService {
     // Get original todolist first to copy its data
     const originalList = await this.getTodoList(id);
 
-    // Create new todolist with same expiration duration
-    const expiresAt = new Date(originalList.expires_at);
-    const now = new Date();
-    const expirationHours = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60));
-
-    // Create new todolist with copied items (all uncompleted) and tags
+    // Create new todolist with 24 hours expiration
     return this.createTodoList({
-      expiration_hours: Math.max(1, expirationHours), // Minimum 1 hour
+      expiration_hours: 24, // Always set to 24 hours
       items: originalList.items.map((item) => ({
         content: item.content,
         completed: false, // Set all items as uncompleted
