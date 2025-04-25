@@ -24,6 +24,7 @@ export default function TodoPage() {
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isPolling, setIsPolling] = useState(false);
+  const [showShareLinks, setShowShareLinks] = useState(true);
 
   useEffect(() => {
     const fetchTodoList = async () => {
@@ -131,13 +132,30 @@ export default function TodoPage() {
       {/* Background Pattern */}
       <div className='fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]' />
 
-      <div className='relative min-h-screen grid place-items-center p-4'>
+      <div className='fixed top-0 left-0 w-full min-h-screen place-items-center p-4 pt-20 z-10'>
         <div className='w-full max-w-3xl backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-glass-lg border border-white/20 dark:border-white/10'>
           {/* Header Section */}
           <div className='relative px-6 py-5 border-b border-slate-200/50 dark:border-slate-700/50'>
             <div className='grid gap-4'>
               <div className='flex items-center justify-between'>
-                <h1 className='text-2xl font-semibold text-slate-900 dark:text-white'>{isEditable ? 'Edit Todo List' : 'View Todo List'}</h1>
+                <div className='flex items-center gap-2'>
+                  <h1 className='text-2xl font-semibold text-slate-900 dark:text-white'>{isEditable ? 'Edit Todo List' : 'View Todo List'}</h1>
+                  <button className='ml-2 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-lg' onClick={() => setShowShareLinks((v) => !v)} type='button' aria-label={showShareLinks ? 'Hide Share Links' : 'Show Share Links'}>
+                    {showShareLinks ? (
+                      // Chevron up in square
+                      <svg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' className='w-5 h-5'>
+                        <rect x='3' y='3' width='18' height='18' rx='3' fill='none' />
+                        <polyline points='8 14 12 10 16 14' />
+                      </svg>
+                    ) : (
+                      // Chevron down in square
+                      <svg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' className='w-5 h-5'>
+                        <rect x='3' y='3' width='18' height='18' rx='3' fill='none' />
+                        <polyline points='8 10 12 14 16 10' />
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 <div className='flex items-center gap-2'>
                   {(isSaving || isSyncing) && (
                     <div className='flex items-center px-3 py-1.5 bg-blue-50/80 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full border border-blue-200/50 dark:border-blue-700/50 shadow-sm text-xs font-medium outline outline-1 outline-blue-200/50 dark:outline-blue-700/50'>
@@ -184,47 +202,24 @@ export default function TodoPage() {
 
           {/* Share Links Section */}
           <div className='p-6'>
-            <div className='space-y-4'>
-              <div className='grid md:grid-cols-2 gap-4'>
-                {/* View Link */}
-                <div className='space-y-2'>
-                  <label className='block text-xs font-medium text-slate-700 dark:text-slate-300'>View Link</label>
-                  <div className='group relative'>
-                    <div className='absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200'></div>
-                    <div className='relative flex'>
-                      {/* Icon readonly (eye) */}
-                      <span className='absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none'>
-                        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-5 h-5'>
-                          <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 12C2.25 12 5.25 5.25 12 5.25s9.75 6.75 9.75 6.75-3 6.75-9.75 6.75S2.25 12 2.25 12z' />
-                          <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
-                        </svg>
-                      </span>
-                      <input type='text' value={viewUrl} readOnly className='flex-1 px-3 py-2 pl-8 text-sm bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-blue-500/50' />
-                      <button onClick={() => handleCopyLink(viewUrl, 'view')} className='px-4 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-r-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition duration-200 flex items-center justify-center'>
-                        <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-5 h-5'>
-                          <path strokeLinecap='round' strokeLinejoin='round' d='M16.5 8.25V6.75A2.25 2.25 0 0014.25 4.5h-6A2.25 2.25 0 006 6.75v6A2.25 2.25 0 008.25 15h1.5' />
-                          <path strokeLinecap='round' strokeLinejoin='round' d='M18 9.75h-6A2.25 2.25 0 009.75 12v6A2.25 2.25 0 0012 20.25h6A2.25 2.25 0 0020.25 18v-6A2.25 2.25 0 0018 9.75z' />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Edit Link */}
-                {isEditable && (
+            {showShareLinks === true ? (
+              <div className='space-y-4'>
+                <div className='grid md:grid-cols-2 gap-4'>
+                  {/* View Link */}
                   <div className='space-y-2'>
-                    <label className='block text-xs font-medium text-slate-700 dark:text-slate-300'>Edit Link</label>
+                    <label className='block text-xs font-medium text-slate-700 dark:text-slate-300'>View Link</label>
                     <div className='group relative'>
-                      <div className='absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200'></div>
+                      <div className='absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200'></div>
                       <div className='relative flex'>
-                        {/* Icon edit (pencil) */}
+                        {/* Icon readonly (eye) */}
                         <span className='absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none'>
                           <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-5 h-5'>
-                            <path strokeLinecap='round' strokeLinejoin='round' d='M16.862 3.487a2.1 2.1 0 1 1 2.97 2.97L8.978 17.31a4.2 4.2 0 0 1-1.67 1.05l-3.33 1.11a.6.6 0 0 1-.76-.76l1.11-3.33a4.2 4.2 0 0 1 1.05-1.67l10.479-10.223Z' />
+                            <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 12C2.25 12 5.25 5.25 12 5.25s9.75 6.75 9.75 6.75-3 6.75-9.75 6.75S2.25 12 2.25 12z' />
+                            <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
                           </svg>
                         </span>
-                        <input type='text' value={editUrl} readOnly className='flex-1 px-3 py-2 pl-8 text-sm bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-purple-500/50' />
-                        <button onClick={() => handleCopyLink(editUrl, 'edit')} className='px-4 text-sm bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-r-lg hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition duration-200 flex items-center justify-center'>
+                        <input type='text' value={viewUrl} readOnly className='flex-1 px-3 py-2 pl-8 text-sm bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-blue-500/50' />
+                        <button onClick={() => handleCopyLink(viewUrl, 'view')} className='px-4 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-r-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition duration-200 flex items-center justify-center'>
                           <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-5 h-5'>
                             <path strokeLinecap='round' strokeLinejoin='round' d='M16.5 8.25V6.75A2.25 2.25 0 0014.25 4.5h-6A2.25 2.25 0 006 6.75v6A2.25 2.25 0 008.25 15h1.5' />
                             <path strokeLinecap='round' strokeLinejoin='round' d='M18 9.75h-6A2.25 2.25 0 009.75 12v6A2.25 2.25 0 0012 20.25h6A2.25 2.25 0 0020.25 18v-6A2.25 2.25 0 0018 9.75z' />
@@ -233,16 +228,43 @@ export default function TodoPage() {
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
 
-              <div className='bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30 rounded-lg p-3 flex items-start gap-2'>
-                <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0' viewBox='0 0 20 20' fill='currentColor'>
-                  <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z' clipRule='evenodd' />
-                </svg>
-                <p className='text-xs text-slate-600 dark:text-slate-300'>{isEditable ? 'Share the view link for read-only access. Keep the edit link private.' : 'This is a read-only view. You cannot make changes.'}</p>
+                  {/* Edit Link */}
+                  {isEditable && (
+                    <div className='space-y-2'>
+                      <label className='block text-xs font-medium text-slate-700 dark:text-slate-300'>Edit Link</label>
+                      <div className='group relative'>
+                        <div className='absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200'></div>
+                        <div className='relative flex'>
+                          {/* Icon edit (pencil) */}
+                          <span className='absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none'>
+                            <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-5 h-5'>
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M16.862 3.487a2.1 2.1 0 1 1 2.97 2.97L8.978 17.31a4.2 4.2 0 0 1-1.67 1.05l-3.33 1.11a.6.6 0 0 1-.76-.76l1.11-3.33a4.2 4.2 0 0 1 1.05-1.67l10.479-10.223Z' />
+                            </svg>
+                          </span>
+                          <input type='text' value={editUrl} readOnly className='flex-1 px-3 py-2 pl-8 text-sm bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-purple-500/50' />
+                          <button onClick={() => handleCopyLink(editUrl, 'edit')} className='px-4 text-sm bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-r-lg hover:from-purple-600 hover:to-pink-700 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition duration-200 flex items-center justify-center'>
+                            <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-5 h-5'>
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M16.5 8.25V6.75A2.25 2.25 0 0014.25 4.5h-6A2.25 2.25 0 006 6.75v6A2.25 2.25 0 008.25 15h1.5' />
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M18 9.75h-6A2.25 2.25 0 009.75 12v6A2.25 2.25 0 0012 20.25h6A2.25 2.25 0 0020.25 18v-6A2.25 2.25 0 0018 9.75z' />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className='bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/30 rounded-lg p-3 flex items-start gap-2'>
+                  <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4 text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0' viewBox='0 0 20 20' fill='currentColor'>
+                    <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z' clipRule='evenodd' />
+                  </svg>
+                  <p className='text-xs text-slate-600 dark:text-slate-300'>{isEditable ? 'Share the view link for read-only access. Keep the edit link private.' : 'This is a read-only view. You cannot make changes.'}</p>
+                </div>
               </div>
-            </div>
+            ) : showShareLinks === false ? (
+              <div className='h-px bg-slate-100 dark:bg-slate-800 my-2' />
+            ) : null}
           </div>
 
           {/* Todo List Component */}

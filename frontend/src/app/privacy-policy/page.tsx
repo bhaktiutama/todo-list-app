@@ -3,7 +3,7 @@ export default function PrivacyPolicyPage() {
     <main className='min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
       {/* Background Pattern */}
       <div className='fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]' />
-      <div className='relative min-h-screen grid place-items-center p-4'>
+      <div className='fixed top-0 left-0 w-full min-h-screen place-items-center p-4 pt-20 z-10'>
         <div className='w-full max-w-3xl backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-glass-lg border border-white/20 dark:border-white/10'>
           <div className='relative px-6 py-5 border-b border-slate-200/50 dark:border-slate-700/50'>
             <h1 className='text-2xl font-semibold text-slate-900 dark:text-white'>Privacy Policy</h1>
