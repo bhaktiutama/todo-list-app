@@ -4,11 +4,10 @@ import Image from 'next/image';
 export default function Navbar() {
   return (
     <nav className='fixed top-0 left-0 w-full z-40 bg-white/90 dark:bg-slate-900/90 border-b border-slate-200/50 dark:border-slate-700/50 shadow-sm backdrop-blur'>
-      <div className='max-w-3xl mx-auto flex items-center justify-between px-4 py-4'>
+      <div className='max-w-3xl mx-auto flex items-center justify-between px-4 py-3'>
         <div className='flex items-center gap-3'>
-          <Image src='/logo.png' alt='Todo List Bin Logo' width={32} height={32} priority className='block dark:hidden' />
-          <Image src='/logo-dark.png' alt='Todo List Bin Logo Dark' width={32} height={32} priority className='hidden dark:block' />
-          <span className='text-xl font-bold tracking-tight text-blue-700 dark:text-blue-300'>Todo List Bin</span>
+          <Image src='/logo-landscape.png' alt='Todo List Bin Logo' width={160} height={0} style={{ height: 'auto' }} priority className='block dark:hidden' />
+          <Image src='/logo-landscape-dark.png' alt='Todo List Bin Logo Dark' width={160} height={0} style={{ height: 'auto' }} priority className='hidden dark:block' />
         </div>
         <div className='flex items-center gap-4'>
           <Link href='/about' className='font-normal text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors'>

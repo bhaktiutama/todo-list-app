@@ -24,7 +24,7 @@ export default function TodoPage() {
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isPolling, setIsPolling] = useState(false);
-  const [showShareLinks, setShowShareLinks] = useState(true);
+  const [showShareLinks, setShowShareLinks] = useState(false);
 
   useEffect(() => {
     const fetchTodoList = async () => {
