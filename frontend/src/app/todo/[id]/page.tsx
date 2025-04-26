@@ -132,7 +132,7 @@ export default function TodoPage() {
       {/* Background Pattern */}
       <div className='fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]' />
 
-      <div className='fixed top-0 left-0 w-full min-h-screen place-items-center p-4 pt-20 z-10'>
+      <div className='relative top-0 left-0 w-full min-h-screen place-items-center p-4 pt-10 z-10'>
         <div className='w-full max-w-3xl backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-glass-lg border border-white/20 dark:border-white/10'>
           {/* Header Section */}
           <div className='relative px-6 py-5 border-b border-slate-200/50 dark:border-slate-700/50'>
