@@ -125,7 +125,7 @@ export default function Home() {
       {/* Background Pattern */}
       <div className='fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]' />
 
-      <div className='relative min-h-screen grid place-items-center p-4'>
+      <div className='relative top-0 left-0 w-full min-h-screen place-items-center p-4 pt-10 z-10'>
         <div className='w-full max-w-3xl backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-glass-lg border border-white/20 dark:border-white/10 p-6'>
           <h1 className='text-3xl font-bold text-center mb-8 bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent'>Create a Shareable Todo List</h1>
 

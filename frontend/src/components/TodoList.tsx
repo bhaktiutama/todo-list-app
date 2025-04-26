@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { TodoItem as TodoItemComponent } from './TodoItem';
-import { TodoItem as TodoItemType, TodoList as TodoListType } from '../types/todo';
+import { TodoItem as TodoItemType, TodoList as TodoListType, ViewStatus, LikeStatus } from '../types/todo';
 import { todoApi } from '../services/api';
 import { TagInput } from './tag/TagInput';
 import { FilterInput } from './task/FilterInput';
 import { SortDropdown, TaskSort } from './task/SortDropdown';
 import { DragDropContext, Droppable, Draggable, DropResult, DroppableProvided, DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd';
+import { getClientFingerprint } from '../utils/fingerprint';
 
 interface TodoListProps {
   todoList: TodoListType;
@@ -22,6 +23,47 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   const [filterText, setFilterText] = useState('');
   const [sort, setSort] = useState<TaskSort>('order');
   const [tags, setTags] = useState<string[]>(todoList.tags?.map((tag) => tag.name) || []);
+  const [viewStatus, setViewStatus] = useState<ViewStatus>({ hasViewed: false, viewCount: initialTodoList.view_count });
+  const [likeStatus, setLikeStatus] = useState<LikeStatus>({ isLiked: false, likeCount: initialTodoList.like_count });
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
+
+  // Record view and check like status on mount
+  useEffect(() => {
+    const initializeViewAndLike = async () => {
+      try {
+        const fingerprint = await getClientFingerprint();
+
+        // Record view
+        await todoApi.recordView(todoList.id, fingerprint);
+
+        // Check view and like status
+        const [viewResult, likeResult] = await Promise.all([todoApi.checkViewStatus(todoList.id, fingerprint), todoApi.checkLikeStatus(todoList.id, fingerprint)]);
+
+        setViewStatus(viewResult);
+        setLikeStatus(likeResult);
+      } catch (error) {
+        console.error('Error initializing view and like:', error);
+      }
+    };
+
+    initializeViewAndLike();
+  }, [todoList.id]);
+
+  // Handle like toggle
+  const handleLikeToggle = async () => {
+    if (isLikeLoading) return;
+
+    try {
+      setIsLikeLoading(true);
+      const fingerprint = await getClientFingerprint();
+      const result = await todoApi.toggleLike(todoList.id, fingerprint);
+      setLikeStatus(result);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    } finally {
+      setIsLikeLoading(false);
+    }
+  };
 
   // Update local state when initialTodoList changes
   useEffect(() => {
@@ -224,15 +266,15 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
                       <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
                       <path strokeLinecap='round' strokeLinejoin='round' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
                     </svg>
-                    123
+                    {viewStatus.viewCount}
                   </div>
                   {/* Likes */}
-                  <div className='flex items-center px-3 py-1 rounded-full bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-300 shadow-sm text-sm font-semibold' title='Likes'>
-                    <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 mr-1.5' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                  <button onClick={handleLikeToggle} disabled={isLikeLoading} className={`flex items-center px-3 py-1 rounded-full ${likeStatus.isLiked ? 'bg-pink-100 dark:bg-pink-800/30' : 'bg-pink-50 dark:bg-pink-900/30'} text-pink-600 dark:text-pink-300 shadow-sm text-sm font-semibold transition-all duration-200 ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-200 dark:hover:bg-pink-800/50 cursor-pointer'}`} title={likeStatus.isLiked ? 'Unlike' : 'Like'}>
+                    <svg xmlns='http://www.w3.org/2000/svg' className={`h-5 w-5 mr-1.5 transition-transform duration-200 ${isLikeLoading ? 'animate-pulse' : ''} ${likeStatus.isLiked ? 'scale-110' : 'scale-100'}`} fill={likeStatus.isLiked ? 'currentColor' : 'none'} viewBox='0 0 24 24' stroke='currentColor' strokeWidth={likeStatus.isLiked ? 0 : 2}>
                       <path strokeLinecap='round' strokeLinejoin='round' d='M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z' />
                     </svg>
-                    45
-                  </div>
+                    {likeStatus.likeCount}
+                  </button>
                 </div>
               </div>
 

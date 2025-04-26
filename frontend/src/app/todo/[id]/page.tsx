@@ -6,6 +6,7 @@ import { TodoList } from '../../../components/TodoList';
 import { TodoItem, TodoList as TodoListType, UpdateTodoListRequest } from '../../../types/todo';
 import { todoApi } from '../../../services/api';
 import DuplicateListButton from '../../../components/DuplicateListButton';
+import { getClientFingerprint } from '../../../utils/fingerprint';
 
 export default function TodoPage() {
   const params = useParams();
@@ -25,6 +26,9 @@ export default function TodoPage() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isPolling, setIsPolling] = useState(false);
   const [showShareLinks, setShowShareLinks] = useState(false);
+  const [viewCount, setViewCount] = useState<number>(0);
+  const [likeCount, setLikeCount] = useState<number>(0);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchTodoList = async () => {
@@ -41,6 +45,17 @@ export default function TodoPage() {
         if (editToken) {
           setEditUrl(`${baseUrl}/todo/${id}?token=${editToken}`);
         }
+
+        // Record view and get initial status
+        const fingerprint = await getClientFingerprint();
+        await todoApi.recordView(id, fingerprint);
+
+        // Get view and like status
+        const [viewStatus, likeStatus] = await Promise.all([todoApi.checkViewStatus(id, fingerprint), todoApi.checkLikeStatus(id, fingerprint)]);
+
+        setViewCount(viewStatus.viewCount);
+        setLikeCount(likeStatus.likeCount);
+        setIsLiked(likeStatus.isLiked);
       } catch (err) {
         setError('Failed to load todo list. It may have expired or been deleted.');
         console.error(err);

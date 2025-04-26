@@ -1,4 +1,4 @@
-import { CreateTodoListRequest, CreateTodoListResponse, TodoList, UpdateTodoListRequest } from '../types/todo';
+import { CreateTodoListRequest, CreateTodoListResponse, TodoList, UpdateTodoListRequest, ViewStatus, LikeStatus } from '../types/todo';
 import { TodoApiService } from './types';
 import { supabase } from '../lib/supabase';
 
@@ -58,6 +58,8 @@ export class SupabaseTodoApi implements TodoApiService {
           expires_at: todoList.expires_at,
           items: insertedItems || [],
           tags: [], // Tags will be fetched in the next request
+          view_count: 0,
+          like_count: 0,
         },
       };
     }
@@ -71,6 +73,8 @@ export class SupabaseTodoApi implements TodoApiService {
         expires_at: todoList.expires_at,
         items: [],
         tags: [], // Tags will be fetched in the next request
+        view_count: 0,
+        like_count: 0,
       },
     };
   }
@@ -104,6 +108,8 @@ export class SupabaseTodoApi implements TodoApiService {
       expires_at: todoList.expires_at,
       items: items || [],
       tags: todoList.tags?.map((t: any) => t.tag) || [],
+      view_count: todoList.view_count || 0,
+      like_count: todoList.like_count || 0,
     };
   }
 
@@ -223,5 +229,83 @@ export class SupabaseTodoApi implements TodoApiService {
       })),
       tags: originalList.tags,
     });
+  }
+
+  async recordView(id: string, fingerprint: string): Promise<void> {
+    try {
+      const { error } = await supabase.from('todo_list_views').insert({
+        todo_list_id: id,
+        fingerprint: fingerprint,
+      });
+
+      if (error && error.code !== '23505') {
+        // Ignore unique constraint violations
+        throw error;
+      }
+    } catch (error) {
+      console.error('Failed to record view:', error);
+      throw new Error('Failed to record view');
+    }
+  }
+
+  async toggleLike(id: string, fingerprint: string): Promise<LikeStatus> {
+    try {
+      // Check if already liked
+      const { data: existingLike } = await supabase.from('todo_list_likes').select().eq('todo_list_id', id).eq('fingerprint', fingerprint).single();
+
+      if (existingLike) {
+        // Unlike: Remove the like
+        const { error: deleteError } = await supabase.from('todo_list_likes').delete().eq('todo_list_id', id).eq('fingerprint', fingerprint);
+
+        if (deleteError) throw deleteError;
+      } else {
+        // Like: Add new like
+        const { error: insertError } = await supabase.from('todo_list_likes').insert({
+          todo_list_id: id,
+          fingerprint: fingerprint,
+        });
+
+        if (insertError) throw insertError;
+      }
+
+      // Get updated status
+      const { data: todoList } = await supabase.from('todo_lists').select('like_count').eq('id', id).single();
+
+      return {
+        isLiked: !existingLike,
+        likeCount: todoList?.like_count || 0,
+      };
+    } catch (error) {
+      console.error('Failed to toggle like:', error);
+      throw new Error('Failed to toggle like');
+    }
+  }
+
+  async checkViewStatus(id: string, fingerprint: string): Promise<ViewStatus> {
+    try {
+      const [viewResult, todoListResult] = await Promise.all([supabase.from('todo_list_views').select().eq('todo_list_id', id).eq('fingerprint', fingerprint).single(), supabase.from('todo_lists').select('view_count').eq('id', id).single()]);
+
+      return {
+        hasViewed: !!viewResult.data,
+        viewCount: todoListResult.data?.view_count || 0,
+      };
+    } catch (error) {
+      console.error('Failed to check view status:', error);
+      throw new Error('Failed to check view status');
+    }
+  }
+
+  async checkLikeStatus(id: string, fingerprint: string): Promise<LikeStatus> {
+    try {
+      const [likeResult, todoListResult] = await Promise.all([supabase.from('todo_list_likes').select().eq('todo_list_id', id).eq('fingerprint', fingerprint).single(), supabase.from('todo_lists').select('like_count').eq('id', id).single()]);
+
+      return {
+        isLiked: !!likeResult.data,
+        likeCount: todoListResult.data?.like_count || 0,
+      };
+    } catch (error) {
+      console.error('Failed to check like status:', error);
+      throw new Error('Failed to check like status');
+    }
   }
 }

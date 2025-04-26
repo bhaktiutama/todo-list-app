@@ -25,6 +25,32 @@ export interface TodoList {
   edit_token?: string;
   items: TodoItem[];
   tags?: Tag[];
+  view_count: number;
+  like_count: number;
+}
+
+export interface TodoListView {
+  id: string;
+  todo_list_id: string;
+  fingerprint: string;
+  created_at: string;
+}
+
+export interface TodoListLike {
+  id: string;
+  todo_list_id: string;
+  fingerprint: string;
+  created_at: string;
+}
+
+export interface ViewStatus {
+  hasViewed: boolean;
+  viewCount: number;
+}
+
+export interface LikeStatus {
+  isLiked: boolean;
+  likeCount: number;
 }
 
 export interface CreateTodoListRequest {
