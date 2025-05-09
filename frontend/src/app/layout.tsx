@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className='bg-gradient-to-br from-slate-50 to-white dark:from-dark-bg dark:to-dark-surface min-h-screen transition-colors duration-200' suppressHydrationWarning>
+      <body className='bg-gradient-to-br from-slate-200 to-white dark:from-dark-bg dark:to-dark-surface min-h-screen transition-colors duration-200' suppressHydrationWarning>
         <ThemeProvider>
           <Navbar />
           <div className='relative pt-14'>

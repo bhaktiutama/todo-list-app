@@ -1,6 +1,6 @@
 export default function PrivacyPolicyPage() {
   return (
-    <main className='min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
+    <main className='min-h-screen bg-gradient-to-br from-slate-200 via-purple-50/40 to-blue-50/40 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
       {/* Background Pattern */}
       <div className='fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]' />
       <div className='relative top-0 left-0 w-full min-h-screen place-items-center p-4 pt-10 z-10'>

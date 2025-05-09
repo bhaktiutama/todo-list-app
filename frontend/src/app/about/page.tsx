@@ -1,6 +1,6 @@
 export default function AboutPage() {
   return (
-    <main className='min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
+    <main className='min-h-screen bg-gradient-to-br from-slate-200 via-purple-50/40 to-blue-50/40 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
       {/* Background Pattern */}
       <div className='fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,transparent)] pointer-events-none opacity-50 dark:opacity-[0.02]' />
       <div className='relative top-0 left-0 w-full min-h-screen place-items-center p-4 pt-10 z-10'>
@@ -10,6 +10,7 @@ export default function AboutPage() {
           </div>
           <div className='p-6 pt-0 text-slate-700 dark:text-slate-300'>
             <div className='px-8 py-8 text-slate-700 dark:text-slate-300'>
+              <p className='mb-4 leading-relaxed'>Life is full of things to do—big or small. TodoList Bin helps you organize them all, from daily chores to personal goals. Write down tasks, track progress, and start taking action. Whether it's a quick reminder or a big project, your to-do list is where it begins. Small steps add up. Start today, and see how your list helps you move forward.</p>
               <p className='mb-2'>
                 <strong>Todo List Bin</strong> is a modern, shareable todo list app inspired by Pastebin. It allows you to quickly create, manage, and share task lists online—no registration required.
               </p>
