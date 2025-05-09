@@ -54,6 +54,7 @@ export interface LikeStatus {
 }
 
 export interface CreateTodoListRequest {
+  title: string;
   expiration_hours: number;
   edit_token?: string;
   items: Omit<TodoItem, 'id' | 'created_at' | 'completed_at'>[];

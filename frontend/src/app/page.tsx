@@ -64,6 +64,7 @@ export default function Home() {
   const [items, setItems] = useState<Omit<TodoItem, 'id' | 'created_at' | 'completed_at'>[]>([{ content: '', completed: false, order: 0, priority: 'medium' }]);
   const [tags, setTags] = useState<string[]>([]);
   const [expirationHours, setExpirationHours] = useState<number>(24);
+  const [title, setTitle] = useState<string>('Your Tasks');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
@@ -158,6 +159,7 @@ export default function Home() {
 
     try {
       const request: CreateTodoListRequest = {
+        title,
         expiration_hours: expirationHours,
         items: items.filter((item) => item.content.trim()),
         tags: tags.map((name) => ({ name })),
@@ -233,13 +235,19 @@ export default function Home() {
                 <div className='p-6'>
                   {error && <div className='bg-red-50/80 dark:bg-red-900/30 border border-red-200/50 dark:border-red-700/50 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-4'>{error}</div>}
                   <div className='space-y-6'>
-                    <div>
-                      <label className='block text-slate-700 dark:text-slate-300 mb-2 text-sm font-medium'>Expiration Time</label>
-                      <select value={expirationHours} onChange={(e) => setExpirationHours(Number(e.target.value))} className='w-full p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50'>
-                        <option value={1}>1 hour</option>
-                        <option value={24}>1 day</option>
-                        <option value={168}>1 week</option>
-                      </select>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                      <div>
+                        <label className='block text-slate-700 dark:text-slate-300 mb-2 text-sm font-medium'>Title</label>
+                        <input type='text' value={title} onChange={(e) => setTitle(e.target.value)} className='w-full px-2 py-1 bg-transparent text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent focus:outline-none' placeholder='Your Tasks' />
+                      </div>
+                      <div>
+                        <label className='block text-slate-700 dark:text-slate-300 mb-2 text-sm font-medium'>Expiration Time</label>
+                        <select value={expirationHours} onChange={(e) => setExpirationHours(Number(e.target.value))} className='w-full p-2 bg-white/90 dark:bg-slate-800/90 border border-slate-200/50 dark:border-slate-700/50 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50'>
+                          <option value={1}>1 hour</option>
+                          <option value={24}>1 day</option>
+                          <option value={168}>1 week</option>
+                        </select>
+                      </div>
                     </div>
                     <div>
                       <label className='block text-slate-700 dark:text-slate-300 mb-2 text-sm font-medium'>Tags</label>
@@ -259,7 +267,7 @@ export default function Home() {
                           </button>
                         </div>
                       ))}
-                      <button onClick={handleAddItem} className='w-full mt-4 px-4 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors duration-200'>
+                      <button onClick={handleAddItem} className='w-full mt-4 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 border border-blue-200/50 dark:border-blue-700/50 text-blue-600 dark:text-blue-400 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50'>
                         <div className='flex items-center justify-center'>
                           <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5 mr-2' viewBox='0 0 20 20' fill='currentColor'>
                             <path fillRule='evenodd' d='M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z' clipRule='evenodd' />
