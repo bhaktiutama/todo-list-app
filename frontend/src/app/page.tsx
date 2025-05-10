@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { TodoItem, CreateTodoListRequest } from '../types/todo';
+import { TodoItem, CreateTodoListRequest, TodoList } from '../types/todo';
 import { todoApi } from '../services/api';
 import { Priority } from '../types/priority';
 import { PrioritySelector } from '../components/priority/PrioritySelector';
@@ -34,18 +34,96 @@ export default function Home() {
   const router = useRouter();
   const firstInputRef = useRef<HTMLInputElement>(null);
   const lastInputRef = useRef<HTMLInputElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
+
+  // Form states
   const [items, setItems] = useState<Omit<TodoItem, 'id' | 'created_at' | 'completed_at'>[]>([{ content: '', completed: false, order: 0, priority: 'medium' }]);
   const [tags, setTags] = useState<string[]>([]);
   const [expirationHours, setExpirationHours] = useState<number>(24);
   const [title, setTitle] = useState<string>('Your Tasks');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
-  const [search, setSearch] = React.useState('');
-  const [timeline, setTimeline] = React.useState(MOCK_TIMELINE);
-  const [visibleCount, setVisibleCount] = React.useState(10);
-  const [showCreateForm, setShowCreateForm] = React.useState(true);
-  const mainRef = React.useRef<HTMLDivElement>(null);
+
+  // Timeline states
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
+  const [timeline, setTimeline] = useState<TodoList[]>([]);
+  const [trendingTags, setTrendingTags] = useState<string[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | undefined>();
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // Load initial data
+  const loadTimeline = useCallback(
+    async (reset: boolean = false) => {
+      try {
+        setIsLoadingMore(true);
+
+        // Reset timeline if filters change
+        const cursor = reset ? undefined : nextCursor;
+
+        const timelineResponse = await todoApi.getTimelineTodoLists({
+          cursor,
+          limit: 10,
+          tags: selectedTags,
+          search,
+        });
+
+        setTimeline((prev) => (reset ? timelineResponse.data : [...prev, ...timelineResponse.data]));
+        setNextCursor(timelineResponse.nextCursor);
+        setHasMore(timelineResponse.hasMore);
+      } catch (err) {
+        console.error('Failed to load timeline:', err);
+        setError('Failed to load todo lists');
+      } finally {
+        setIsLoadingMore(false);
+      }
+    },
+    [nextCursor, selectedTags, search]
+  );
+
+  // Load trending tags
+  const loadTrendingTags = useCallback(async () => {
+    try {
+      const tags = await todoApi.getTrendingTags(10);
+      setTrendingTags(tags);
+    } catch (err) {
+      console.error('Failed to load trending tags:', err);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    loadTimeline(true);
+    loadTrendingTags();
+  }, []);
+
+  // Reload when filters change
+  useEffect(() => {
+    loadTimeline(true);
+  }, [selectedTags, search]);
+
+  // Infinite scroll
+  useEffect(() => {
+    const handleScroll = async () => {
+      if (!mainRef.current || loadingRef.current || !hasMore || isLoadingMore) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = mainRef.current;
+      if (scrollTop + clientHeight >= scrollHeight - 100) {
+        loadingRef.current = true;
+        await loadTimeline();
+        loadingRef.current = false;
+      }
+    };
+
+    const node = mainRef.current;
+    if (node) node.addEventListener('scroll', handleScroll);
+    return () => {
+      if (node) node.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMore, isLoadingMore, loadTimeline]);
 
   // Auto focus on first input when component mounts
   useEffect(() => {
@@ -69,6 +147,7 @@ export default function Home() {
       setTags([]);
       setExpirationHours(24);
       setError(null);
+      setShowCreateForm(true);
       if (firstInputRef.current) {
         firstInputRef.current.focus();
       }
@@ -150,29 +229,6 @@ export default function Home() {
     }
   };
 
-  // Infinite scroll (tanpa library)
-  React.useEffect(() => {
-    const handleScroll = () => {
-      if (!mainRef.current) return;
-      const { scrollTop, scrollHeight, clientHeight } = mainRef.current;
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        setVisibleCount((c) => Math.min(c + 10, timeline.length));
-      }
-    };
-    const node = mainRef.current;
-    if (node) node.addEventListener('scroll', handleScroll);
-    return () => {
-      if (node) node.removeEventListener('scroll', handleScroll);
-    };
-  }, [timeline.length]);
-
-  // Filter timeline by tag & search
-  const filteredTimeline = timeline.filter((item) => {
-    const matchTag = selectedTags.length === 0 || item.tags.some((t) => selectedTags.includes(t));
-    const matchSearch = !search || item.title.toLowerCase().includes(search.toLowerCase());
-    return matchTag && matchSearch;
-  });
-
   return (
     <main className='min-h-screen flex justify-center bg-gradient-to-br from-slate-200 via-purple-50/40 to-blue-50/40 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
       {/* Main Content */}
@@ -202,9 +258,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {!showCreateForm && <div className='h-px bg-slate-100 dark:bg-slate-800 my-2' />}
-
-              {showCreateForm && (
+              {showCreateForm ? (
                 <div className='p-6'>
                   {error && <div className='bg-red-50/80 dark:bg-red-900/30 border border-red-200/50 dark:border-red-700/50 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-4'>{error}</div>}
                   <div className='space-y-6'>
@@ -264,6 +318,8 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
+              ) : (
+                <div className='h-px bg-slate-100 dark:bg-slate-800 my-2' />
               )}
             </div>
           </div>
@@ -279,7 +335,7 @@ export default function Home() {
                 </div>
               </div>
               <div className='p-6'>
-                <FilterTag tags={MOCK_TRENDING_TAGS} selectedTags={selectedTags} onChange={setSelectedTags} />
+                <FilterTag tags={trendingTags} selectedTags={selectedTags} onChange={setSelectedTags} />
               </div>
             </div>
           </div>
@@ -298,7 +354,7 @@ export default function Home() {
                     type='text'
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder='Cari todo list...'
+                    placeholder='Search todo lists...'
                     className='w-full px-6 py-4 pl-12 rounded-xl border border-white/20 dark:border-white/10 
                       bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl
                       text-slate-900 dark:text-slate-100 
@@ -314,35 +370,19 @@ export default function Home() {
 
           {/* Timeline */}
           <div className='flex flex-col gap-6'>
-            {filteredTimeline.slice(0, visibleCount).map((item) => (
-              <TodoListCard
-                key={item.id}
-                todoList={{
-                  id: item.id,
-                  title: item.title,
-                  items: item.items.map((it) => ({
-                    ...it,
-                    id: `${item.id}-${it.content}`,
-                    todo_list_id: item.id,
-                    priority: it.priority || 'medium',
-                    completed: it.completed,
-                    content: it.content,
-                    order: 0,
-                  })),
-                  tags: item.tags.map((tag) => ({
-                    id: `${item.id}-${tag}`,
-                    name: tag,
-                    created_at: item.createdAt,
-                    updated_at: item.createdAt,
-                  })),
-                  created_at: item.createdAt,
-                  expires_at: item.expiration_time,
-                  view_count: item.view_count,
-                  like_count: item.like_count,
-                }}
-                onClick={() => router.push(`/todo/${item.id}`)}
-              />
+            {timeline.map((item) => (
+              <TodoListCard key={item.id} todoList={item} onClick={() => router.push(`/todo/${item.id}`)} />
             ))}
+
+            {isLoadingMore && (
+              <div className='flex justify-center py-4'>
+                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
+              </div>
+            )}
+
+            {!isLoadingMore && !hasMore && timeline.length > 0 && <div className='text-center py-4 text-slate-500 dark:text-slate-400'>No more todo lists to load</div>}
+
+            {!isLoadingMore && timeline.length === 0 && <div className='text-center py-4 text-slate-500 dark:text-slate-400'>No todo lists found</div>}
           </div>
         </div>
       </section>

@@ -1,52 +1,76 @@
 import { CreateTodoListRequest, CreateTodoListResponse, TodoList, UpdateTodoListRequest, ViewStatus, LikeStatus } from '../types/todo';
-import { TodoApiService } from './types';
+import { TodoApiService, TimelineOptions, TimelineResponse } from './types';
 import { supabase } from '../lib/supabase';
 
 export class SupabaseTodoApi implements TodoApiService {
   async createTodoList(request: CreateTodoListRequest): Promise<CreateTodoListResponse> {
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + request.expiration_hours);
+    try {
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + request.expiration_hours);
 
-    const { data: todoList, error } = await supabase
-      .from('todo_lists')
-      .insert({
-        expires_at: expiresAt.toISOString(),
-        edit_token: request.edit_token || Math.random().toString(36).substring(2, 15),
-      })
-      .select()
-      .single();
+      const { data: todoList, error } = await supabase
+        .from('todo_lists')
+        .insert({
+          title: request.title,
+          expires_at: expiresAt.toISOString(),
+          edit_token: request.edit_token || Math.random().toString(36).substring(2, 15),
+        })
+        .select()
+        .single();
 
-    if (error) throw new Error('Failed to create todo list');
-    if (!todoList) throw new Error('No todo list created');
+      if (error) {
+        console.error('Failed to create todo list:', error);
+        throw new Error(`Failed to create todo list: ${error.message}`);
+      }
+      if (!todoList) throw new Error('No todo list created');
 
-    // Create initial items if provided
-    if (request.items && request.items.length > 0) {
-      const { data: insertedItems, error: itemsError } = await supabase
-        .from('todo_items')
-        .insert(
-          request.items.map((item) => ({
-            todo_list_id: todoList.id,
-            content: item.content,
-            completed: item.completed,
-            order: item.order,
-            priority: item.priority || 'medium',
-          }))
-        )
-        .select();
+      // Create initial items if provided
+      if (request.items && request.items.length > 0) {
+        const { data: insertedItems, error: itemsError } = await supabase
+          .from('todo_items')
+          .insert(
+            request.items.map((item) => ({
+              todo_list_id: todoList.id,
+              content: item.content,
+              completed: item.completed,
+              order: item.order,
+              priority: item.priority || 'medium',
+            }))
+          )
+          .select();
 
-      if (itemsError) throw new Error('Failed to create todo items');
-
-      // Add tags if provided
-      if (request.tags && request.tags.length > 0) {
-        const { error: tagError } = await supabase.rpc('manage_todolist_tags', {
-          p_todolist_id: todoList.id,
-          p_tag_names: request.tags.map((tag) => tag.name),
-        });
-
-        if (tagError) {
-          console.error('Tag creation error:', tagError);
-          throw new Error('Failed to add tags to todo list');
+        if (itemsError) {
+          console.error('Failed to create todo items:', itemsError);
+          throw new Error(`Failed to create todo items: ${itemsError.message}`);
         }
+
+        // Add tags if provided
+        if (request.tags && request.tags.length > 0) {
+          const { error: tagError } = await supabase.rpc('manage_todolist_tags', {
+            p_todolist_id: todoList.id,
+            p_tag_names: request.tags.map((tag) => tag.name),
+          });
+
+          if (tagError) {
+            console.error('Tag creation error:', tagError);
+            throw new Error(`Failed to add tags to todo list: ${tagError.message}`);
+          }
+        }
+
+        return {
+          id: todoList.id,
+          edit_token: todoList.edit_token,
+          todo_list: {
+            id: todoList.id,
+            title: todoList.title,
+            created_at: todoList.created_at,
+            expires_at: todoList.expires_at,
+            items: insertedItems || [],
+            tags: [], // Tags will be fetched in the next request
+            view_count: 0,
+            like_count: 0,
+          },
+        };
       }
 
       return {
@@ -54,29 +78,19 @@ export class SupabaseTodoApi implements TodoApiService {
         edit_token: todoList.edit_token,
         todo_list: {
           id: todoList.id,
+          title: todoList.title,
           created_at: todoList.created_at,
           expires_at: todoList.expires_at,
-          items: insertedItems || [],
+          items: [],
           tags: [], // Tags will be fetched in the next request
           view_count: 0,
           like_count: 0,
         },
       };
+    } catch (error) {
+      console.error('Error in createTodoList:', error);
+      throw error;
     }
-
-    return {
-      id: todoList.id,
-      edit_token: todoList.edit_token,
-      todo_list: {
-        id: todoList.id,
-        created_at: todoList.created_at,
-        expires_at: todoList.expires_at,
-        items: [],
-        tags: [], // Tags will be fetched in the next request
-        view_count: 0,
-        like_count: 0,
-      },
-    };
   }
 
   async getTodoList(id: string): Promise<TodoList> {
@@ -104,6 +118,7 @@ export class SupabaseTodoApi implements TodoApiService {
     // Transform the todo list to match the expected format
     return {
       id: todoList.id,
+      title: todoList.title,
       created_at: todoList.created_at,
       expires_at: todoList.expires_at,
       items: items || [],
@@ -220,6 +235,7 @@ export class SupabaseTodoApi implements TodoApiService {
 
     // Create new todolist with 24 hours expiration
     return this.createTodoList({
+      title: `Copy of ${originalList.title}`,
       expiration_hours: 24, // Always set to 24 hours
       items: originalList.items.map((item) => ({
         content: item.content,
@@ -227,7 +243,7 @@ export class SupabaseTodoApi implements TodoApiService {
         order: item.order,
         priority: item.priority,
       })),
-      tags: originalList.tags,
+      tags: originalList.tags?.map((tag) => ({ name: tag.name })),
     });
   }
 
@@ -307,5 +323,87 @@ export class SupabaseTodoApi implements TodoApiService {
       console.error('Failed to check like status:', error);
       throw new Error('Failed to check like status');
     }
+  }
+
+  async getTimelineTodoLists(options: TimelineOptions = {}): Promise<TimelineResponse> {
+    const { cursor, limit = 10, tags = [], search = '' } = options;
+
+    let query = supabase
+      .from('todo_lists')
+      .select(
+        `
+        *,
+        items:todo_items(
+          id,
+          content,
+          completed,
+          order,
+          priority
+        ),
+        tags:todolist_tags(
+          tag:tags(*)
+        )
+      `,
+        { count: 'exact' }
+      )
+      .order('created_at', { ascending: false })
+      .limit(limit + 1); // Get one extra to determine if there are more items
+
+    // Apply cursor if provided
+    if (cursor) {
+      query = query.lt('created_at', cursor);
+    }
+
+    // Apply tag filter if provided
+    if (tags.length > 0) {
+      query = query.contains('tags', tags);
+    }
+
+    // Apply search filter if provided
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,items.content.ilike.%${search}%`);
+    }
+
+    const { data: todoLists, error, count } = await query;
+
+    if (error) throw new Error('Failed to get timeline todo lists');
+
+    // Remove the extra item we fetched to check for more
+    const hasMore = todoLists && todoLists.length > limit;
+    const items = todoLists ? todoLists.slice(0, limit) : [];
+
+    // Transform the todo lists to match the expected format
+    const transformedLists = items.map((list: any) => ({
+      id: list.id,
+      title: list.title,
+      created_at: list.created_at,
+      expires_at: list.expires_at,
+      items: list.items || [],
+      tags: list.tags?.map((t: any) => t.tag) || [],
+      view_count: list.view_count || 0,
+      like_count: list.like_count || 0,
+    }));
+
+    // Get the cursor for the next page
+    const nextCursor = hasMore && items.length > 0 ? items[items.length - 1].created_at : undefined;
+
+    return {
+      data: transformedLists,
+      nextCursor,
+      hasMore,
+      total: count || 0,
+    };
+  }
+
+  async getTrendingTags(limit: number = 10): Promise<string[]> {
+    const { data, error } = await supabase.rpc('get_trending_tags', { p_limit: limit });
+
+    if (error) {
+      console.error('Failed to get trending tags:', error);
+      throw new Error(`Failed to get trending tags: ${error.message}`);
+    }
+
+    // Transform the data to just return the tag names
+    return (data || []).map((tag: { name: string; usage_count: number }) => tag.name);
   }
 }

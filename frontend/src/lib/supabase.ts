@@ -1,15 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export interface Database {
   public: {
@@ -20,18 +12,27 @@ export interface Database {
           created_at: string;
           expires_at: string;
           edit_token: string;
+          title: string;
+          view_count: number;
+          like_count: number;
         };
         Insert: {
           id?: string;
           created_at?: string;
           expires_at: string;
           edit_token: string;
+          title?: string;
+          view_count?: number;
+          like_count?: number;
         };
         Update: {
           id?: string;
           created_at?: string;
           expires_at?: string;
           edit_token?: string;
+          title?: string;
+          view_count?: number;
+          like_count?: number;
         };
       };
       todo_items: {
@@ -102,6 +103,46 @@ export interface Database {
           created_at?: string;
         };
       };
+      todo_list_views: {
+        Row: {
+          id: string;
+          todo_list_id: string;
+          fingerprint: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          todo_list_id: string;
+          fingerprint: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          todo_list_id?: string;
+          fingerprint?: string;
+          created_at?: string;
+        };
+      };
+      todo_list_likes: {
+        Row: {
+          id: string;
+          todo_list_id: string;
+          fingerprint: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          todo_list_id: string;
+          fingerprint: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          todo_list_id?: string;
+          fingerprint?: string;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -114,9 +155,35 @@ export interface Database {
         };
         Returns: void;
       };
+      get_trending_tags: {
+        Args: {
+          p_limit: number;
+        };
+        Returns: { name: string; usage_count: number }[];
+      };
+      search_todo_lists: {
+        Args: {
+          p_search: string | null;
+          p_tags: string[] | null;
+          p_cursor: string | null;
+          p_limit: number;
+        };
+        Returns: {
+          id: string;
+          title: string;
+          created_at: string;
+          expires_at: string;
+          view_count: number;
+          like_count: number;
+          items: any[];
+          tags: any[];
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
     };
   };
 }
+
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
