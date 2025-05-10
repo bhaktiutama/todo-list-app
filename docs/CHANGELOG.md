@@ -2,6 +2,25 @@
 
 Semua perubahan penting pada proyek ini akan didokumentasikan di file ini.
 
+## [2.0.1] - 2024-03-22
+
+### Changed
+
+- Memindahkan trending tags dari sidebar ke area konten utama antara form create dan search
+- Menyesuaikan warna border card dengan form create (border-white/20)
+- Menyederhanakan struktur layout untuk menghindari double scroll
+- Meningkatkan konsistensi visual antara halaman utama dan edit todo list
+- Mengubah perilaku tombol Duplicate List agar selalu tampil tapi disabled di halaman utama
+- Memperbaiki styling tombol Duplicate List saat disabled dengan opacity dan cursor not-allowed
+- Memperbaiki pesan tooltip pada tombol Duplicate List sesuai konteks halaman
+- Meningkatkan visual feedback loading indicator dengan padding yang lebih konsisten
+
+### Fixed
+
+- Memperbaiki infinite scroll pada halaman utama dengan mengubah event listener dari div ke window
+- Memperbaiki layout container utama untuk mendukung scrolling yang lebih baik
+- Menambahkan padding bottom yang lebih besar (pb-20) untuk area loading
+
 ## [2.0.0] - 2024-03-20
 
 ### Added

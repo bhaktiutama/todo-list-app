@@ -108,20 +108,22 @@ export default function Home() {
   // Infinite scroll
   useEffect(() => {
     const handleScroll = async () => {
-      if (!mainRef.current || loadingRef.current || !hasMore || isLoadingMore) return;
+      if (loadingRef.current || !hasMore || isLoadingMore) return;
 
-      const { scrollTop, scrollHeight, clientHeight } = mainRef.current;
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+      if (scrollTop + windowHeight >= documentHeight - 100) {
         loadingRef.current = true;
         await loadTimeline();
         loadingRef.current = false;
       }
     };
 
-    const node = mainRef.current;
-    if (node) node.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      if (node) node.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [hasMore, isLoadingMore, loadTimeline]);
 
@@ -232,8 +234,8 @@ export default function Home() {
   return (
     <main className='min-h-screen flex justify-center bg-gradient-to-br from-slate-200 via-purple-50/40 to-blue-50/40 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/30'>
       {/* Main Content */}
-      <section className='flex-1 max-w-3xl overflow-y-auto' ref={mainRef}>
-        <div className='w-full p-4 pt-10'>
+      <section className='flex-1 max-w-3xl w-full'>
+        <div className='w-full p-4 pt-10 pb-20'>
           {/* Form Create Todo List */}
           <div className='mb-6'>
             <div className='backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 rounded-2xl shadow-glass-lg border border-white/20 dark:border-white/10'>
@@ -368,21 +370,21 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Timeline */}
+          {/* Timeline with better loading indicators */}
           <div className='flex flex-col gap-6'>
             {timeline.map((item) => (
               <TodoListCard key={item.id} todoList={item} onClick={() => router.push(`/todo/${item.id}`)} />
             ))}
 
             {isLoadingMore && (
-              <div className='flex justify-center py-4'>
+              <div className='flex justify-center py-8'>
                 <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
               </div>
             )}
 
-            {!isLoadingMore && !hasMore && timeline.length > 0 && <div className='text-center py-4 text-slate-500 dark:text-slate-400'>No more todo lists to load</div>}
+            {!isLoadingMore && !hasMore && timeline.length > 0 && <div className='text-center py-8 text-slate-500 dark:text-slate-400'>No more todo lists to load</div>}
 
-            {!isLoadingMore && timeline.length === 0 && <div className='text-center py-4 text-slate-500 dark:text-slate-400'>No todo lists found</div>}
+            {!isLoadingMore && timeline.length === 0 && <div className='text-center py-8 text-slate-500 dark:text-slate-400'>No todo lists found</div>}
           </div>
         </div>
       </section>
