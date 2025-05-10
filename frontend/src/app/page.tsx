@@ -9,6 +9,8 @@ import { PrioritySelector } from '../components/priority/PrioritySelector';
 import { TagInput } from '../components/tag/TagInput';
 import NewListButton from '@/components/NewListButton';
 import { FilterTag } from '@/components/tag/FilterTag';
+import { TodoListCard } from '@/components/TodoListCard';
+import { formatTimeLeft, formatRelativeTime } from '@/utils/dateUtils';
 
 const MOCK_TRENDING_TAGS = ['urgent', 'work', 'personal', 'shopping', 'study', 'project', 'health', 'travel', 'finance', 'fun'];
 
@@ -27,35 +29,6 @@ const MOCK_TIMELINE = Array.from({ length: 20 }).map((_, i) => ({
   view_count: Math.floor(Math.random() * 100) + 50,
   expiration_time: new Date(Date.now() + (Math.floor(Math.random() * 72) + 1) * 3600 * 1000).toISOString(),
 }));
-
-function formatRelativeTime(dateStr: string) {
-  const now = Date.now();
-  const d = new Date(dateStr).getTime();
-  const diff = Math.floor((now - d) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
-
-// Tambah fungsi untuk format sisa waktu expired
-function formatTimeLeft(expirationTime: string) {
-  const now = Date.now();
-  const expiration = new Date(expirationTime).getTime();
-  const diff = Math.floor((expiration - now) / 1000);
-
-  if (diff <= 0) return 'Expired';
-
-  const hours = Math.floor(diff / 3600);
-  const minutes = Math.floor((diff % 3600) / 60);
-
-  if (hours > 24) {
-    const days = Math.floor(hours / 24);
-    return `${days}d left`;
-  }
-  if (hours > 0) return `${hours}h left`;
-  return `${minutes}m left`;
-}
 
 export default function Home() {
   const router = useRouter();
@@ -312,90 +285,63 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className='flex flex-col md:flex-row md:items-center gap-2 mb-6'>
-            <div className='flex-1'>
-              <div className='relative'>
-                <span className='absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none z-10'>
-                  <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
-                    <path strokeLinecap='round' strokeLinejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z' />
-                  </svg>
-                </span>
-                <input
-                  type='text'
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder='Cari todo list...'
-                  className='w-full px-6 py-4 pl-12 rounded-xl border border-white/20 dark:border-white/10 
-                    bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl
-                    text-slate-900 dark:text-slate-100 
-                    placeholder-slate-400 dark:placeholder-slate-500
-                    shadow-glass-lg
-                    focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50
-                    text-base'
-                />
+          <div className='mb-6'>
+            <div className='flex flex-col md:flex-row md:items-center gap-2'>
+              <div className='flex-1'>
+                <div className='relative'>
+                  <span className='absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none z-10'>
+                    <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z' />
+                    </svg>
+                  </span>
+                  <input
+                    type='text'
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder='Cari todo list...'
+                    className='w-full px-6 py-4 pl-12 rounded-xl border border-white/20 dark:border-white/10 
+                      bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl
+                      text-slate-900 dark:text-slate-100 
+                      placeholder-slate-400 dark:placeholder-slate-500
+                      shadow-glass-lg
+                      focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50
+                      text-base'
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Timeline */}
-          <div className='flex flex-col gap-3'>
+          <div className='flex flex-col gap-6'>
             {filteredTimeline.slice(0, visibleCount).map((item) => (
-              <div key={item.id} className='bg-white/80 dark:bg-slate-900/80 border border-white/20 dark:border-white/10 rounded-xl p-4 shadow-glass-lg hover:shadow-lg transition cursor-pointer' onClick={() => router.push(`/todo/${item.id}`)}>
-                <div className='flex flex-col gap-2'>
-                  <div className='flex items-start justify-between'>
-                    <div className='flex-1'>
-                      <div className='font-semibold text-slate-800 dark:text-slate-100 text-lg truncate'>{item.title}</div>
-                      <div className='flex flex-wrap gap-2 mt-1'>
-                        {item.tags.map((tag) => (
-                          <span key={tag} className='px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200'>{`#${tag}`}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className='text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap'>{formatRelativeTime(item.createdAt)}</div>
-                  </div>
-
-                  {/* Excerpt items */}
-                  <ul className='mt-1 ml-2 list-disc text-slate-600 dark:text-slate-300 text-sm'>
-                    {item.items &&
-                      item.items.slice(0, 2).map((it: any, idx: number) => (
-                        <li key={idx} className='truncate'>
-                          {it.content}
-                        </li>
-                      ))}
-                    {item.items && item.items.length > 2 && <li className='italic text-xs text-slate-400 dark:text-slate-500'>...and more</li>}
-                  </ul>
-
-                  {/* Stats & Info */}
-                  <div className='-mx-4 px-4 pt-2 mt-2 border-t border-slate-100 dark:border-slate-800'>
-                    <div className='flex items-center gap-4'>
-                      {/* Like Count */}
-                      <div className='flex items-center gap-1 text-slate-500 dark:text-slate-400'>
-                        <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4' viewBox='0 0 20 20' fill='currentColor'>
-                          <path d='M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z' />
-                        </svg>
-                        <span className='text-xs'>{item.like_count}</span>
-                      </div>
-
-                      {/* View Count */}
-                      <div className='flex items-center gap-1 text-slate-500 dark:text-slate-400'>
-                        <svg xmlns='http://www.w3.org/2000/svg' className='h-4 w-4' viewBox='0 0 20 20' fill='currentColor'>
-                          <path d='M10 12a2 2 0 100-4 2 2 0 000 4z' />
-                          <path fillRule='evenodd' d='M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z' clipRule='evenodd' />
-                        </svg>
-                        <span className='text-xs'>{item.view_count}</span>
-                      </div>
-
-                      {/* Expiration Time */}
-                      <div className='flex items-center gap-1 ml-auto'>
-                        <svg xmlns='http://www.w3.org/2000/svg' className={`h-4 w-4 ${new Date(item.expiration_time) <= new Date() ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`} viewBox='0 0 20 20' fill='currentColor'>
-                          <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z' clipRule='evenodd' />
-                        </svg>
-                        <span className={`text-xs font-medium ${new Date(item.expiration_time) <= new Date() ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`}>{formatTimeLeft(item.expiration_time)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <TodoListCard
+                key={item.id}
+                todoList={{
+                  id: item.id,
+                  title: item.title,
+                  items: item.items.map((it) => ({
+                    ...it,
+                    id: `${item.id}-${it.content}`,
+                    todo_list_id: item.id,
+                    priority: it.priority || 'medium',
+                    completed: it.completed,
+                    content: it.content,
+                    order: 0,
+                  })),
+                  tags: item.tags.map((tag) => ({
+                    id: `${item.id}-${tag}`,
+                    name: tag,
+                    created_at: item.createdAt,
+                    updated_at: item.createdAt,
+                  })),
+                  created_at: item.createdAt,
+                  expires_at: item.expiration_time,
+                  view_count: item.view_count,
+                  like_count: item.like_count,
+                }}
+                onClick={() => router.push(`/todo/${item.id}`)}
+              />
             ))}
           </div>
         </div>

@@ -20,6 +20,7 @@ export interface TodoItem {
 
 export interface TodoList {
   id: string;
+  title: string;
   created_at: string;
   expires_at: string;
   edit_token?: string;
