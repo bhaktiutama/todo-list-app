@@ -63,6 +63,7 @@ export interface CreateTodoListRequest {
 }
 
 export interface UpdateTodoListRequest {
+  title?: string;
   items?: TodoItem[];
   tags?: string[]; // Array of tag names
 }

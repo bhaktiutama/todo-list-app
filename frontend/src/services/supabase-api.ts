@@ -136,6 +136,16 @@ export class SupabaseTodoApi implements TodoApiService {
 
     if (verifyError || !todoList) throw new Error('Invalid edit token');
 
+    // Update title if provided
+    if (request.title !== undefined) {
+      const { error: titleError } = await supabase.from('todo_lists').update({ title: request.title }).eq('id', id);
+
+      if (titleError) {
+        console.error('Title update error:', titleError);
+        throw new Error('Failed to update title');
+      }
+    }
+
     // Update items
     if (request.items) {
       // Get current items to compare

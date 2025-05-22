@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TodoItem as TodoItemComponent } from './TodoItem';
-import { TodoItem as TodoItemType, TodoList as TodoListType, ViewStatus, LikeStatus } from '../types/todo';
+import { TodoItem as TodoItemType, TodoList as TodoListType, ViewStatus, LikeStatus, UpdateTodoListRequest } from '../types/todo';
 import { todoApi } from '../services/api';
 import { TagInput } from './tag/TagInput';
 import { FilterInput } from './task/FilterInput';
@@ -20,6 +20,8 @@ interface TodoListProps {
 export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSaving = false, setIsSyncing, setIsPolling }: TodoListProps) {
   const [todoList, setTodoList] = useState<TodoListType>(initialTodoList);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(initialTodoList.title);
   const [filterText, setFilterText] = useState('');
   const [sort, setSort] = useState<TaskSort>('order');
   const [tags, setTags] = useState<string[]>(todoList.tags?.map((tag) => tag.name) || []);
@@ -33,16 +35,11 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
       try {
         const fingerprint = await getClientFingerprint();
 
-        // Record view
-        await todoApi.recordView(todoList.id, fingerprint);
-
-        // Check view and like status
-        const [viewResult, likeResult] = await Promise.all([todoApi.checkViewStatus(todoList.id, fingerprint), todoApi.checkLikeStatus(todoList.id, fingerprint)]);
-
-        setViewStatus(viewResult);
+        // Check like status only - view is handled by parent
+        const likeResult = await todoApi.checkLikeStatus(todoList.id, fingerprint);
         setLikeStatus(likeResult);
       } catch (error) {
-        console.error('Error initializing view and like:', error);
+        console.error('Error initializing like status:', error);
       }
     };
 
@@ -68,6 +65,7 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   // Update local state when initialTodoList changes
   useEffect(() => {
     setTodoList(initialTodoList);
+    setEditedTitle(initialTodoList.title);
     // Update tags when todoList changes
     const incomingTags = initialTodoList.tags?.map((tag) => tag.name) || [];
     console.log('Received updated todo list with tags:', incomingTags);
@@ -248,6 +246,39 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
   // Gunakan urutan asli untuk drag, filtered untuk tampilan biasa
   const draggableItems = isDragActive ? todoList.items : filteredItems;
 
+  // Add new handler for title update
+  const handleTitleUpdate = async () => {
+    if (!isEditable || editedTitle.trim() === '') return;
+
+    setIsEditing(true);
+    const updatedTodoList = {
+      ...todoList,
+      title: editedTitle.trim(),
+    };
+
+    try {
+      // Send only the necessary fields for update
+      const updateRequest: UpdateTodoListRequest = {
+        title: editedTitle.trim(),
+      };
+      await onUpdate(updatedTodoList); // Parent component expects full TodoList
+      setTodoList(updatedTodoList);
+    } catch (error) {
+      console.error('Failed to update title:', error);
+      // Revert to previous title on error
+      setEditedTitle(todoList.title);
+    } finally {
+      setIsEditing(false);
+      setIsEditingTitle(false);
+    }
+  };
+
+  // Add handler for title edit cancel
+  const handleTitleEditCancel = () => {
+    setEditedTitle(todoList.title);
+    setIsEditingTitle(false);
+  };
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId='todo-list-droppable' isDropDisabled={!isDragActive}>
@@ -256,7 +287,38 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
             <div className='flex flex-col space-y-4'>
               <div className='flex justify-between items-center flex-wrap gap-y-2'>
                 <div className='flex flex-col'>
-                  <h2 className='text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent'>Your Tasks</h2>
+                  {isEditingTitle && isEditable ? (
+                    <div className='flex items-center gap-2'>
+                      <input
+                        type='text'
+                        value={editedTitle}
+                        onChange={(e) => setEditedTitle(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleTitleUpdate();
+                          } else if (e.key === 'Escape') {
+                            handleTitleEditCancel();
+                          }
+                        }}
+                        className='text-3xl font-bold bg-transparent border-b-2 border-blue-500 dark:border-blue-400 focus:outline-none focus:border-blue-600 dark:focus:border-blue-300 text-slate-900 dark:text-white'
+                        autoFocus
+                      />
+                      <button onClick={handleTitleUpdate} className='p-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300' title='Save'>
+                        <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
+                          <path fillRule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clipRule='evenodd' />
+                        </svg>
+                      </button>
+                      <button onClick={handleTitleEditCancel} className='p-1 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300' title='Cancel'>
+                        <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
+                          <path fillRule='evenodd' d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z' clipRule='evenodd' />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <h2 className='text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent cursor-pointer' onClick={() => isEditable && setIsEditingTitle(true)} title={isEditable ? 'Click to edit' : undefined}>
+                      {todoList.title}
+                    </h2>
+                  )}
                 </div>
                 {/* Badge modern untuk views dan likes */}
                 <div className='flex flex-row gap-2 items-center mt-2 sm:mt-0'>
