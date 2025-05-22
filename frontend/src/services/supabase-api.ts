@@ -366,12 +366,69 @@ export class SupabaseTodoApi implements TodoApiService {
 
     // Apply tag filter if provided
     if (tags.length > 0) {
-      query = query.contains('tags', tags);
+      // First get the tag IDs
+      const { data: tagIds } = await supabase.from('tags').select('id').in('name', tags);
+
+      if (tagIds && tagIds.length > 0) {
+        // Then get the todo list IDs that have these tags
+        const { data: todoListIds } = await supabase
+          .from('todolist_tags')
+          .select('todolist_id')
+          .in(
+            'tag_id',
+            tagIds.map((t) => t.id)
+          );
+
+        if (todoListIds && todoListIds.length > 0) {
+          query = query.in(
+            'id',
+            todoListIds.map((item) => item.todolist_id)
+          );
+        } else {
+          // If no todo lists found with these tags, return empty result
+          return {
+            data: [],
+            nextCursor: undefined,
+            hasMore: false,
+            total: 0,
+          };
+        }
+      } else {
+        // If no tags found, return empty result
+        return {
+          data: [],
+          nextCursor: undefined,
+          hasMore: false,
+          total: 0,
+        };
+      }
     }
 
     // Apply search filter if provided
     if (search) {
-      query = query.or(`title.ilike.%${search}%,items.content.ilike.%${search}%`);
+      // First get todo lists that match the title
+      const titleQuery = supabase.from('todo_lists').select('id').ilike('title', `%${search}%`);
+
+      // Then get todo lists that have matching items
+      const itemsQuery = supabase.from('todo_items').select('todo_list_id').ilike('content', `%${search}%`);
+
+      // Get both results
+      const [titleResults, itemResults] = await Promise.all([titleQuery, itemsQuery]);
+
+      // Combine the IDs (removing duplicates)
+      const matchingIds = Array.from(new Set([...(titleResults.data?.map((t) => t.id) || []), ...(itemResults.data?.map((i) => i.todo_list_id) || [])]));
+
+      if (matchingIds.length > 0) {
+        query = query.in('id', matchingIds);
+      } else {
+        // If no matches found, return empty result
+        return {
+          data: [],
+          nextCursor: undefined,
+          hasMore: false,
+          total: 0,
+        };
+      }
     }
 
     const { data: todoLists, error, count } = await query;
