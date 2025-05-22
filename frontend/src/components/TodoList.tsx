@@ -344,7 +344,7 @@ export function TodoList({ todoList: initialTodoList, isEditable, onUpdate, isSa
                 <TagInput tags={tags} onChange={handleTagsChange} />
               </div>
               <div className='flex flex-wrap gap-2 items-center w-full'>
-                <FilterInput value={filterText} onChange={setFilterText} />
+                <input type='text' value={filterText} onChange={(e) => setFilterText(e.target.value)} placeholder='Search tasks...' className='search-box flex-1 px-4 py-2 bg-white/80 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-blue-400/50 transition-all' />
                 <SortDropdown value={sort} onChange={setSort} />
               </div>
 

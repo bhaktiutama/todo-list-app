@@ -17,7 +17,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
   }
 
   return (
-    <button onClick={toggleTheme} className={`p-2 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors duration-200 hover:bg-slate-300 dark:hover:bg-slate-600 z-50 ${className}`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} type='button'>
+    <button onClick={toggleTheme} className={`theme-toggle p-2 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors duration-200 hover:bg-slate-300 dark:hover:bg-slate-600 z-50 ${className}`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} type='button'>
       {theme === 'light' ? (
         // Moon icon for light theme
         <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='w-6 h-6'>

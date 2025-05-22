@@ -5,6 +5,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import NewListButton from '@/components/NewListButton';
 import DuplicateListButton from '@/components/DuplicateListButton';
 import Navbar from '@/components/Navbar';
+import { OnboardingProvider } from '../context/OnboardingContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -47,14 +48,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className='bg-gradient-to-br from-slate-200 to-white dark:from-dark-bg dark:to-dark-surface min-h-screen transition-colors duration-200' suppressHydrationWarning>
         <ThemeProvider>
-          <Navbar />
-          <div className='relative pt-14'>
-            {/* Tombol New List, Duplicate, dan ThemeToggle di pojok kanan atas, vertikal dan rapi */}
-            <NewListButton className='fixed right-4 top-4 z-50' />
-            <DuplicateListButton className='fixed right-4 top-16 z-50' />
-            <ThemeToggle className='fixed right-4 top-28 z-50' />
-            {children}
-          </div>
+          <OnboardingProvider>
+            <Navbar />
+            <div className='relative pt-14'>
+              {/* Tombol New List, Duplicate, dan ThemeToggle di pojok kanan atas, vertikal dan rapi */}
+              <NewListButton className='fixed right-4 top-4 z-50' />
+              <DuplicateListButton className='fixed right-4 top-16 z-50' />
+              <ThemeToggle className='fixed right-4 top-28 z-50' />
+              {children}
+            </div>
+          </OnboardingProvider>
         </ThemeProvider>
       </body>
     </html>
