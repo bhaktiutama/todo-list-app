@@ -266,7 +266,7 @@ export default function Home() {
                 </div>
 
                 {showCreateForm ? (
-                  <div className='todo-form space-y-6 p-6 bg-gradient-to-br from-white/80 to-white/40 dark:from-slate-800/80 dark:to-slate-900/40 rounded-2xl border border-white/20 dark:border-white/10 shadow-xl'>
+                  <div className='p-6'>
                     {error && <div className='bg-red-50/80 dark:bg-red-900/30 border border-red-200/50 dark:border-red-700/50 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-4'>{error}</div>}
                     <div className='space-y-6'>
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
