@@ -2,7 +2,7 @@
 
 Aplikasi Todo List yang dapat dibagikan, dibangun dengan Next.js dan Supabase. Aplikasi ini memungkinkan pengguna untuk membuat, mengedit, dan berbagi daftar tugas tanpa perlu login. Dihasilkan dengan vibe coding menggunakan Cursor.ai.
 
-🚀 **Demo**: [https://todo-list-pastebin.vercel.app/](https://todo-list-pastebin.vercel.app/)
+🚀 **Demo**: [https://todolistbin.netlify.app/](https://todolistbin.netlify.app/)
 
 ![Todo List Pastebin Screenshot](docs/screenshot.png)
 
@@ -39,7 +39,6 @@ Aplikasi Todo List yang dapat dibagikan, dibangun dengan Next.js dan Supabase. A
 todo-list-app/
 ├── frontend/               # Kode frontend Next.js
 │   ├── public/             # Aset statis
-│   ├── src/
 │   │   ├── app/            # Komponen Next.js App Router
 │   │   ├── components/     # Komponen React reusable
 │   │   ├── hooks/          # Custom React hooks

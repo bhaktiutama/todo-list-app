@@ -78,11 +78,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Italian Dinner Party Menu',
         '[
-            {"content": "Make homemade pasta dough", "order": 1, "priority": "high"},
-            {"content": "Prepare tomato sauce", "order": 2, "priority": "high"},
-            {"content": "Make tiramisu", "order": 3, "priority": "medium"},
-            {"content": "Prepare garlic bread", "order": 4, "priority": "low"},
-            {"content": "Buy Italian wine", "order": 5, "priority": "medium"}
+            {"content": "Make fresh pasta dough (mix 2 cups flour, 3 eggs, pinch of salt) and let rest for 30 minutes", "order": 1, "priority": "high"},
+            {"content": "Prepare authentic tomato sauce with San Marzano tomatoes, fresh basil, and garlic - simmer for 2 hours", "order": 2, "priority": "high"},
+            {"content": "Make classic tiramisu with mascarpone, ladyfingers, and freshly brewed espresso - prepare 4 hours ahead", "order": 3, "priority": "medium"},
+            {"content": "Prepare garlic bread using fresh Italian bread, roasted garlic, and high-quality olive oil", "order": 4, "priority": "low"},
+            {"content": "Buy Italian wine (recommended: Chianti Classico or Barolo) from specialty wine shop", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['cooking', 'recipe', 'food']
     );
@@ -91,11 +91,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Tokyo 5-Day Trip Plan',
         '[
-            {"content": "Visit Tsukiji Fish Market", "order": 1, "priority": "high"},
-            {"content": "Explore Akihabara", "order": 2, "priority": "medium"},
-            {"content": "Day trip to Mt. Fuji", "order": 3, "priority": "high"},
-            {"content": "Shopping in Shibuya", "order": 4, "priority": "medium"},
-            {"content": "Visit Senso-ji Temple", "order": 5, "priority": "medium"}
+            {"content": "Visit Tsukiji Fish Market at 5 AM for tuna auction, followed by sushi breakfast at Building 6", "order": 1, "priority": "high"},
+            {"content": "Explore Akihabara - visit Super Potato retro games, Yodobashi Camera, and anime shops on main street", "order": 2, "priority": "medium"},
+            {"content": "Day trip to Mt. Fuji - take 7:30 AM bus from Shinjuku Station to 5th station, hike to observation point", "order": 3, "priority": "high"},
+            {"content": "Shopping in Shibuya - visit Shibuya 109, explore Center Gai, and watch sunset at Shibuya Sky", "order": 4, "priority": "medium"},
+            {"content": "Visit Senso-ji Temple early morning (7 AM), explore Nakamise shopping street, then Asakusa area", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['travel', 'vacation']
     );
@@ -104,11 +104,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Weekly Sprint Tasks',
         '[
-            {"content": "Code review for frontend PR", "order": 1, "priority": "high"},
-            {"content": "Update API documentation", "order": 2, "priority": "medium"},
-            {"content": "Team meeting preparation", "order": 3, "priority": "high"},
-            {"content": "Debug production issue", "order": 4, "priority": "high"},
-            {"content": "Write unit tests", "order": 5, "priority": "medium"}
+            {"content": "Review frontend PR #234 - focus on new authentication implementation and component optimization", "order": 1, "priority": "high"},
+            {"content": "Update API documentation for new endpoints (/users/profile and /users/settings) with examples", "order": 2, "priority": "medium"},
+            {"content": "Prepare sprint review presentation - include velocity metrics and feature demos for stakeholders", "order": 3, "priority": "high"},
+            {"content": "Debug production issue with user session timeout - check Redis cache and JWT token expiration", "order": 4, "priority": "high"},
+            {"content": "Write unit tests for new payment processing module - ensure 90% coverage with Jest", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['work', 'project']
     );
@@ -117,11 +117,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Monthly Grocery List',
         '[
-            {"content": "Fresh vegetables and fruits", "order": 1, "priority": "high"},
-            {"content": "Meat and fish", "order": 2, "priority": "high"},
-            {"content": "Dairy products", "order": 3, "priority": "medium"},
-            {"content": "Cleaning supplies", "order": 4, "priority": "low"},
-            {"content": "Snacks and beverages", "order": 5, "priority": "low"}
+            {"content": "Buy organic vegetables (spinach, carrots, tomatoes) and seasonal fruits from farmers market", "order": 1, "priority": "high"},
+            {"content": "Purchase grass-fed beef, wild-caught salmon, and free-range chicken from butcher section", "order": 2, "priority": "high"},
+            {"content": "Get dairy products: Greek yogurt, organic milk, aged cheddar, and grass-fed butter", "order": 3, "priority": "medium"},
+            {"content": "Stock up on eco-friendly cleaning supplies: laundry detergent, dish soap, and surface cleaners", "order": 4, "priority": "low"},
+            {"content": "Buy healthy snacks (nuts, dried fruits) and beverages (green tea, sparkling water)", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['shopping', 'home']
     );
@@ -130,11 +130,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Spring Home Maintenance',
         '[
-            {"content": "Clean gutters", "order": 1, "priority": "high"},
-            {"content": "Check smoke detectors", "order": 2, "priority": "high"},
-            {"content": "Service HVAC system", "order": 3, "priority": "medium"},
-            {"content": "Pressure wash deck", "order": 4, "priority": "low"},
-            {"content": "Clean windows", "order": 5, "priority": "medium"}
+            {"content": "Clean gutters thoroughly - remove debris, check downspouts, and install gutter guards", "order": 1, "priority": "high"},
+            {"content": "Test all smoke detectors, replace batteries, and verify CO2 detector functionality", "order": 2, "priority": "high"},
+            {"content": "Schedule HVAC maintenance - clean filters, check refrigerant levels, test cooling system", "order": 3, "priority": "medium"},
+            {"content": "Pressure wash deck using 2500 PSI washer - treat wood areas and inspect for repairs", "order": 4, "priority": "low"},
+            {"content": "Clean all windows inside and out, repair screens, and check window seals", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['home', 'maintenance']
     );
@@ -143,11 +143,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Monthly Fitness Goals',
         '[
-            {"content": "Run 5km 3x per week", "order": 1, "priority": "high"},
-            {"content": "Strength training Mon/Wed/Fri", "order": 2, "priority": "high"},
-            {"content": "Yoga sessions Tue/Thu", "order": 3, "priority": "medium"},
-            {"content": "Track daily calories", "order": 4, "priority": "medium"},
-            {"content": "Weekly progress photos", "order": 5, "priority": "low"}
+            {"content": "Run 5km 3x per week - follow Couch to 5K program, track with Strava app", "order": 1, "priority": "high"},
+            {"content": "Strength training Mon/Wed/Fri - focus on compound exercises, progressive overload", "order": 2, "priority": "high"},
+            {"content": "Yoga sessions Tue/Thu - 45-minute flow class, focus on flexibility and breathing", "order": 3, "priority": "medium"},
+            {"content": "Track daily calories using MyFitnessPal - aim for 2000 calories with 40% protein", "order": 4, "priority": "medium"},
+            {"content": "Take weekly progress photos and measurements - update fitness journal", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['fitness', 'personal']
     );
@@ -156,11 +156,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Thai Cooking Class Preparation',
         '[
-            {"content": "Buy Thai curry paste", "order": 1, "priority": "high"},
-            {"content": "Get fresh lemongrass", "order": 2, "priority": "high"},
-            {"content": "Prepare coconut milk", "order": 3, "priority": "medium"},
-            {"content": "Get rice noodles", "order": 4, "priority": "medium"},
-            {"content": "Buy fish sauce", "order": 5, "priority": "medium"}
+            {"content": "Buy Mae Ploy red and green curry paste from Asian market - check expiration dates", "order": 1, "priority": "high"},
+            {"content": "Get fresh lemongrass, kaffir lime leaves, and galangal from specialty produce store", "order": 2, "priority": "high"},
+            {"content": "Prepare homemade coconut milk or buy Chaokoh brand - need 4 cans", "order": 3, "priority": "medium"},
+            {"content": "Purchase thin and wide rice noodles for Pad Thai and Pad See Ew", "order": 4, "priority": "medium"},
+            {"content": "Buy premium fish sauce (Red Boat brand) and oyster sauce for stir-fries", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['cooking', 'shopping', 'food']
     );
@@ -169,11 +169,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Build a Garden Bench',
         '[
-            {"content": "Buy lumber and supplies", "order": 1, "priority": "high"},
-            {"content": "Cut wood to size", "order": 2, "priority": "high"},
-            {"content": "Sand all pieces", "order": 3, "priority": "medium"},
-            {"content": "Assemble frame", "order": 4, "priority": "high"},
-            {"content": "Paint and seal", "order": 5, "priority": "medium"}
+            {"content": "Purchase pressure-treated lumber (2x4s, 2x6s), galvanized screws, and weather-resistant stain", "order": 1, "priority": "high"},
+            {"content": "Cut wood according to plans - 4ft seat length with 18-inch height", "order": 2, "priority": "high"},
+            {"content": "Sand all pieces with 120-grit, then 220-grit sandpaper for smooth finish", "order": 3, "priority": "medium"},
+            {"content": "Assemble frame using pocket holes and waterproof wood glue for stability", "order": 4, "priority": "high"},
+            {"content": "Apply 2 coats of exterior stain and sealer - wait 24 hours between coats", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['home', 'weekend', 'project']
     );
@@ -182,11 +182,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'React Advanced Concepts Study',
         '[
-            {"content": "Learn React Hooks", "order": 1, "priority": "high"},
-            {"content": "Practice Context API", "order": 2, "priority": "high"},
-            {"content": "Study Redux patterns", "order": 3, "priority": "medium"},
-            {"content": "Build sample project", "order": 4, "priority": "high"},
-            {"content": "Review documentation", "order": 5, "priority": "medium"}
+            {"content": "Master React Hooks - useEffect, useCallback, useMemo with practical examples", "order": 1, "priority": "high"},
+            {"content": "Build small app using Context API for global state management", "order": 2, "priority": "high"},
+            {"content": "Implement Redux Toolkit with async thunks and RTK Query", "order": 3, "priority": "medium"},
+            {"content": "Create e-commerce sample project with cart functionality and user authentication", "order": 4, "priority": "high"},
+            {"content": "Study React documentation sections on concurrent mode and Suspense", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['study', 'work', 'personal']
     );
@@ -195,11 +195,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Paris Weekend Getaway',
         '[
-            {"content": "Visit Eiffel Tower", "order": 1, "priority": "high"},
-            {"content": "Louvre Museum tour", "order": 2, "priority": "high"},
-            {"content": "Seine River cruise", "order": 3, "priority": "medium"},
-            {"content": "Shop at Champs-Élysées", "order": 4, "priority": "low"},
-            {"content": "Dinner at Le Marais", "order": 5, "priority": "medium"}
+            {"content": "Visit Eiffel Tower - book skip-the-line tickets for sunset (7 PM) viewing", "order": 1, "priority": "high"},
+            {"content": "Tour Louvre Museum - focus on Mona Lisa, Venus de Milo, and Egyptian antiquities", "order": 2, "priority": "high"},
+            {"content": "Take evening Seine River cruise with Bateaux Mouches at 8:30 PM", "order": 3, "priority": "medium"},
+            {"content": "Shop at Champs-Élysées - visit Louis Vuitton flagship store and Ladurée", "order": 4, "priority": "low"},
+            {"content": "Reserve table at LAmbroisie in Le Marais for traditional French cuisine", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['travel', 'weekend', 'vacation']
     );
@@ -208,11 +208,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Birthday Party Organization',
         '[
-            {"content": "Create guest list", "order": 1, "priority": "high"},
-            {"content": "Book venue", "order": 2, "priority": "high"},
-            {"content": "Order cake", "order": 3, "priority": "medium"},
-            {"content": "Plan activities", "order": 4, "priority": "medium"},
-            {"content": "Send invitations", "order": 5, "priority": "high"}
+            {"content": "Create guest list with contact details and dietary restrictions - expect 30 people", "order": 1, "priority": "high"},
+            {"content": "Book rooftop venue at The Grand Hotel - confirm AV equipment and seating", "order": 2, "priority": "high"},
+            {"content": "Order custom cake from Sweet Delights Bakery - chocolate with fresh berries", "order": 3, "priority": "medium"},
+            {"content": "Plan entertainment - hire jazz band for 2 hours and arrange party games", "order": 4, "priority": "medium"},
+            {"content": "Design and send digital invitations via Paperless Post - RSVP deadline 2 weeks prior", "order": 5, "priority": "high"}
         ]'::jsonb,
         ARRAY['personal', 'project']
     );
@@ -221,11 +221,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Weekly Vegetarian Meal Prep',
         '[
-            {"content": "Quinoa Buddha bowls", "order": 1, "priority": "high"},
-            {"content": "Vegetable curry", "order": 2, "priority": "medium"},
-            {"content": "Chickpea salad", "order": 3, "priority": "medium"},
-            {"content": "Lentil soup", "order": 4, "priority": "medium"},
-            {"content": "Roasted vegetables", "order": 5, "priority": "low"}
+            {"content": "Prepare quinoa Buddha bowls with roasted chickpeas, sweet potato, and tahini dressing", "order": 1, "priority": "high"},
+            {"content": "Cook coconut curry with cauliflower, spinach, and tofu - make extra sauce", "order": 2, "priority": "medium"},
+            {"content": "Mix Mediterranean chickpea salad with cucumber, tomatoes, and lemon-herb dressing", "order": 3, "priority": "medium"},
+            {"content": "Make hearty lentil soup with carrots, celery, and fresh herbs - portion for freezing", "order": 4, "priority": "medium"},
+            {"content": "Prep roasted vegetables (brussels sprouts, carrots, broccoli) with garlic and herbs", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['cooking', 'food', 'health']
     );
@@ -234,11 +234,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Home Office Setup',
         '[
-            {"content": "Buy ergonomic chair", "order": 1, "priority": "high"},
-            {"content": "Set up desk", "order": 2, "priority": "high"},
-            {"content": "Install lighting", "order": 3, "priority": "medium"},
-            {"content": "Cable management", "order": 4, "priority": "low"},
-            {"content": "Add plants", "order": 5, "priority": "low"}
+            {"content": "Purchase Herman Miller Aeron chair - size B with lumbar support and adjustable arms", "order": 1, "priority": "high"},
+            {"content": "Assemble standing desk - program height presets and test stability", "order": 2, "priority": "high"},
+            {"content": "Install adjustable LED desk lamp and indirect ambient lighting for video calls", "order": 3, "priority": "medium"},
+            {"content": "Set up cable management system with under-desk trays and velcro ties", "order": 4, "priority": "low"},
+            {"content": "Add low-maintenance plants - snake plant and pothos with self-watering pots", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['home', 'work', 'shopping']
     );
@@ -247,11 +247,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Website Launch Checklist',
         '[
-            {"content": "Final content review", "order": 1, "priority": "high"},
-            {"content": "SEO optimization", "order": 2, "priority": "high"},
-            {"content": "Cross-browser testing", "order": 3, "priority": "high"},
-            {"content": "Security checks", "order": 4, "priority": "high"},
-            {"content": "Backup systems", "order": 5, "priority": "medium"}
+            {"content": "Review all website content - check grammar, links, images, and mobile responsiveness", "order": 1, "priority": "high"},
+            {"content": "Implement SEO best practices - meta tags, sitemap.xml, robots.txt, and schema markup", "order": 2, "priority": "high"},
+            {"content": "Perform cross-browser testing on Chrome, Firefox, Safari, Edge - check all features", "order": 3, "priority": "high"},
+            {"content": "Run security audit - SSL certificate, form validation, SQL injection prevention", "order": 4, "priority": "high"},
+            {"content": "Set up automated daily backups for database and file system with retention policy", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['work', 'project']
     );
@@ -260,11 +260,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Spring Garden Planning',
         '[
-            {"content": "Plan vegetable layout", "order": 1, "priority": "high"},
-            {"content": "Buy seeds", "order": 2, "priority": "high"},
-            {"content": "Prepare soil", "order": 3, "priority": "medium"},
-            {"content": "Set up irrigation", "order": 4, "priority": "medium"},
-            {"content": "Create compost area", "order": 5, "priority": "low"}
+            {"content": "Design vegetable garden layout - companion planting map for tomatoes, herbs, and leafy greens", "order": 1, "priority": "high"},
+            {"content": "Order heirloom vegetable seeds from Baker Creek - include succession planting varieties", "order": 2, "priority": "high"},
+            {"content": "Prepare soil with organic compost and conduct pH test - adjust if needed", "order": 3, "priority": "medium"},
+            {"content": "Install drip irrigation system with timer - separate zones for vegetables and herbs", "order": 4, "priority": "medium"},
+            {"content": "Build three-bin composting system using pallets - add starter material", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['home', 'project']
     );
@@ -273,11 +273,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Quarterly Car Maintenance',
         '[
-            {"content": "Oil change", "order": 1, "priority": "high"},
-            {"content": "Tire rotation", "order": 2, "priority": "high"},
-            {"content": "Check brakes", "order": 3, "priority": "high"},
-            {"content": "Replace air filter", "order": 4, "priority": "medium"},
-            {"content": "Clean interior", "order": 5, "priority": "low"}
+            {"content": "Schedule oil change - synthetic oil 5W-30 and new filter at certified service center", "order": 1, "priority": "high"},
+            {"content": "Rotate tires and check pressure - document tread wear patterns", "order": 2, "priority": "high"},
+            {"content": "Inspect brake pads and rotors - measure pad thickness and surface condition", "order": 3, "priority": "high"},
+            {"content": "Replace cabin and engine air filters - check for proper fit and seal", "order": 4, "priority": "medium"},
+            {"content": "Detail car interior - vacuum, clean leather, and apply protectant to surfaces", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['maintenance', 'personal']
     );
@@ -286,11 +286,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'City Photography Project',
         '[
-            {"content": "Scout locations", "order": 1, "priority": "high"},
-            {"content": "Check equipment", "order": 2, "priority": "high"},
-            {"content": "Morning shoot", "order": 3, "priority": "medium"},
-            {"content": "Edit photos", "order": 4, "priority": "medium"},
-            {"content": "Prepare portfolio", "order": 5, "priority": "low"}
+            {"content": "Research and map urban locations - focus on architecture and street scenes at golden hour", "order": 1, "priority": "high"},
+            {"content": "Clean camera sensor, charge batteries, format memory cards - pack backup gear", "order": 2, "priority": "high"},
+            {"content": "Capture sunrise shots at riverside - use ND filters for long exposures", "order": 3, "priority": "medium"},
+            {"content": "Process RAW files in Lightroom - apply consistent color grading preset", "order": 4, "priority": "medium"},
+            {"content": "Create online portfolio with 20 best shots - write location descriptions", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['project', 'personal']
     );
@@ -299,11 +299,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Moving House Checklist',
         '[
-            {"content": "Pack room by room", "order": 1, "priority": "high"},
-            {"content": "Book moving company", "order": 2, "priority": "high"},
-            {"content": "Update address", "order": 3, "priority": "medium"},
-            {"content": "Transfer utilities", "order": 4, "priority": "high"},
-            {"content": "Clean old house", "order": 5, "priority": "medium"}
+            {"content": "Pack room by room using color-coded labels - inventory valuable items", "order": 1, "priority": "high"},
+            {"content": "Reserve professional moving company for June 15th - get insurance coverage", "order": 2, "priority": "high"},
+            {"content": "Update address with post office, bank, and subscription services", "order": 3, "priority": "medium"},
+            {"content": "Schedule utility transfers (electric, gas, internet) for moving day", "order": 4, "priority": "high"},
+            {"content": "Deep clean old house - schedule professional carpet cleaning", "order": 5, "priority": "medium"}
         ]'::jsonb,
         ARRAY['home', 'project', 'personal']
     );
@@ -312,11 +312,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Spanish Learning Goals',
         '[
-            {"content": "Daily Duolingo", "order": 1, "priority": "high"},
-            {"content": "Watch Spanish movies", "order": 2, "priority": "medium"},
-            {"content": "Practice conversation", "order": 3, "priority": "high"},
-            {"content": "Learn grammar", "order": 4, "priority": "medium"},
-            {"content": "Read Spanish news", "order": 5, "priority": "low"}
+            {"content": "Complete 2 Duolingo lessons daily - focus on verb conjugation and vocabulary", "order": 1, "priority": "high"},
+            {"content": "Watch Spanish movies with Spanish subtitles - 1 movie per week, take notes", "order": 2, "priority": "medium"},
+            {"content": "Practice conversation with language exchange partner via Zoom - 30 mins, twice weekly", "order": 3, "priority": "high"},
+            {"content": "Study Spanish grammar using Practice Makes Perfect workbook - 1 chapter per week", "order": 4, "priority": "medium"},
+            {"content": "Read El País news website for 15 minutes daily - focus on current events section", "order": 5, "priority": "low"}
         ]'::jsonb,
         ARRAY['study', 'personal']
     );
@@ -325,11 +325,11 @@ BEGIN
     PERFORM create_sample_todolist(
         'Beach Vacation Preparation',
         '[
-            {"content": "Book accommodation", "order": 1, "priority": "high"},
-            {"content": "Plan activities", "order": 2, "priority": "medium"},
-            {"content": "Pack beach gear", "order": 3, "priority": "medium"},
-            {"content": "Get sunscreen", "order": 4, "priority": "high"},
-            {"content": "Arrange transport", "order": 5, "priority": "high"}
+            {"content": "Book beachfront accommodation - check reviews, amenities, and distance to attractions", "order": 1, "priority": "high"},
+            {"content": "Research and book activities - snorkeling tour, sunset cruise, beach yoga classes", "order": 2, "priority": "medium"},
+            {"content": "Pack beach essentials - umbrella, chairs, cooler, beach games, and first aid kit", "order": 3, "priority": "medium"},
+            {"content": "Buy reef-safe sunscreen SPF 50+, after-sun lotion, and insect repellent", "order": 4, "priority": "high"},
+            {"content": "Book round-trip airport transfers and research local transportation options", "order": 5, "priority": "high"}
         ]'::jsonb,
         ARRAY['travel', 'vacation', 'personal']
     );
